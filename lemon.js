@@ -7,6 +7,7 @@ const client = new Discord.Client();
 const emoji = require('./corePieces/emoji');
 var rndAction = require('./lemonModules/rndAction');
 
+//Reactions are the way lemonbot responds back whether that be an emoji or a message to users.
 var reactions = {
     hi: [
         'Howdy!',
