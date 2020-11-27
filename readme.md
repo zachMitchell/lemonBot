@@ -2,7 +2,7 @@
 
 ![Lemonbot avatar](./readmeAssets/lemonBot.png)
 
-Lemonbot is a friend all-around Discord bot that hosts a variety of tools and memes! He is based on [Discord.js](https://discord.js.org/#/) and also happens to be the older brother and base of [Printerbot](https://github.com/zachMitchell/printerBot). General code is shared between the two bots.
+Lemonbot is a friendly all-around Discord bot that hosts a variety of tools and memes! He is based on [Discord.js](https://discord.js.org/#/) and also happens to be the older brother and base of [Printerbot](https://github.com/zachMitchell/printerBot). General code is shared between the two bots.
 
 ## Features
 
