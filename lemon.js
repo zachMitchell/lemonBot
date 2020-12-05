@@ -131,9 +131,10 @@ client.on('message',msg=>{
         }
     }
     else if(!gotCommand){
+        var content = msg.content.toLowerCase();
         //Recurse through pre-determined chat responses
         for(var i in responses){
-            if(msg.content.indexOf(i) > -1){
+            if(content.indexOf(i) > -1){
                 responses[i](msg);
                 break;
             }

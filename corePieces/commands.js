@@ -4,6 +4,7 @@
 
 //Load the modules!
 var lemonModules = {};
+var messageOverflow = require('../corePieces/messageOverflow');
 
 //These are file names you can find from lemonModules. For example: eMark.js would be eMark here.
 var moduleList = [
@@ -23,16 +24,17 @@ delete moduleList;
 
 //Command help descriptions are over here. Some dynamic items are here to sort help in alphabetical order
 var helpDescriptions = [
-    ["age" , "Find out the age of two discord accounts"],
-    ["camel" , "typeLikeANerd"],
-    ["creepy" , "tYpE lIkE a CrEePy PeRsOn"],
-    ["dumbot" , "Ask an intelligent question"],
-    ["e" , "b[e] r[e]sponsibl[e] with this on[e]"],
-    ["math" , "Do Stonks"],
-    ["rnd" , "Ask for a random number"],
-    ["rylan" , "Display this man's greatness to the channel"],
-    ["shuf" , "Randomize a list of things"],
-    ["wisdom" , "Recieve good advice from a wise man"]
+    ["age", "Find out the age of two discord accounts"],
+    ["back", "!naidrocsid gnuoy eikooc trams a er'uoy yeh ho"],
+    ["camel", "typeLikeANerd"],
+    ["creepy", "tYpE lIkE a CrEePy PeRsOn"],
+    ["dumbot", "Ask an intelligent question"],
+    ["e", "b[e] r[e]sponsibl[e] with this on[e]"],
+    ["math", "Do Stonks"],
+    ["rnd", "Ask for a random number"],
+    ["rylan", "Display this man's greatness to the channel"],
+    ["shuf", "Randomize a list of things"],
+    ["wisdom", "Recieve good advice from a wise man"]
 ];
 
 var commands = {
@@ -57,6 +59,11 @@ var commands = {
         else m.channel.send('Place in two users and I\'ll figure out which account is older! Like this: `/age @user1 @user2`');
 
     },
+    'back':(m,args)=>{
+        //gorgeous
+        m.reply(args.slice(1).join(' ').split('').reverse().join(''));
+        m.delete();
+    },
     'camel':(m,args)=>{
         m.reply(lemonModules.camelCase(args.slice(1)));
         m.delete();
@@ -70,14 +77,15 @@ var commands = {
         m.channel.send(result[0].join(' ') + result[1][0]);
     },
     'e':m=>{
-        m.reply(lemonModules.eMark(m.content.substring(2))).then(()=>m.delete());
+        let result = lemonModules.eMark(m.content.substring(2));
+        if(!messageOverflow(m,result,m.author.id)) m.reply(result).then(()=>m.delete());
     },
     'math':(m,args)=>{
 
         //Check literally every character to make sure we don't have an abuse on the js math system.
         var mathStr = args.slice(1).join('');
         // console.log(mathStr);
-        var filter = '+-*/%()';
+        var filter = '+-*/%().';
         var invalid = false;
         for(var i = 0;i < mathStr.length;i++){
             if(filter.indexOf(mathStr[i]) == -1 && isNaN(mathStr[i])){

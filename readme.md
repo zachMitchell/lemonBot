@@ -73,3 +73,9 @@ Add your bot's token to `privateConfig.js`, commit the changes and deploy to her
 ```git push heroku herokuBranch:master```
 
 Note the special syntax: `herokuBranch:master`. This means our new branch is pretending to be master. With this, if you decide to contribute to master or you get the latest changes, they won't conflict with your personal work. When you want to get lemonbot updates, either pull from master while on `herokuBranch`, or visit the master branch, pull, then merge `herokuBranch` with master.
+
+# License
+
+![Creative Commons Attribution License](https://i.creativecommons.org/l/by/4.0/88x31.png)
+
+This work is licensed under a [Creative Commons Attribution 4.0 International License.](http://creativecommons.org/licenses/by/4.0/)

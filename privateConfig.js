@@ -67,6 +67,8 @@ var commands = {
 /*Responses - things not in command format. Phrases from this list are scanned from the message itself; for example if someone says "pog"
 in the message "Caleb is pog", lemonbot will find that and execute a function
 
+message is converted to lowercase to match a variety of results.
+
 functions take only one argument - msg
 example function:
 
