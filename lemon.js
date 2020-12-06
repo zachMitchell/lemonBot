@@ -46,7 +46,7 @@ var cooldownDefaults = {
         isGroup:true,
         coolTime:15,
         uses:3,
-        commands:['camel','creepy','e']
+        commands:['camel','creepy','e','back']
     },
     //Clever name am I right? :D
     'once5Secs':{
