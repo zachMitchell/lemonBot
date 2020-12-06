@@ -8,6 +8,7 @@ Lemonbot is a friendly all-around Discord bot that hosts a variety of tools and 
 
 Items straight from /help:
 * /age - Find out the age of two discord accounts
+* /back - !naidrocsid gnuoy eikooc trams a er'uoy yeh ho
 * /camel - typeLikeANerd
 * /creepy - tYpE lIkE a CrEePy PeRsOn
 * /dumbot - Ask an intelligent question
