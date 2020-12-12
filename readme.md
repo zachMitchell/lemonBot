@@ -36,7 +36,13 @@ And most importantly, a guy named Rylan
 * `/voisplit` - *Put everyone randomly (but evenly) into different voice channels* - if you have 6 users in one voice chat room and have two other chat rooms, this command will spread everyone out into groups of 2 amongst selected rooms.
 * `/raid` - *Move entire voice channels into another channel* - you can select multiple channels and group everyone into the last mentioned channel in the command.
 
-## Deploying Lemonbot
+# Instruction manual
+
+The non-admin commands are pretty straightforward to use. The admin commands however can go very in-depth. Because of this, and manual was written to demonstrate Lemonbot's abilities.
+
+[Check this link](./adminManual.md) to open the manual
+
+# Deploying Lemonbot
 
 Every lemonbot deployment requires the minimum steps:
 
@@ -64,7 +70,7 @@ All that's left is to launch lemonbot from the terminal:
 
 If you see him come online, congratulations, He can now accept commands! `/help` is a good start.
 
-### Heroku
+## Heroku
 
 Heroku is how I'm deploying lemonbot for personal use. I would recommend visiting [Heroku's website](https://heroku.com) for learning to deploy over there. When finished, come back here.
 
