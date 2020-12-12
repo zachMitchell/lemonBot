@@ -6,6 +6,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const emoji = require('./corePieces/emoji');
 var rndAction = require('./lemonModules/rndAction');
+var adminCommands = require('./corePieces/adminCommands');
 
 //Reactions are the way lemonbot responds back whether that be an emoji or a message to users.
 var reactions = {
@@ -61,6 +62,10 @@ var cooldownDefaults = {
     'shuf':{ coolTime:15, uses:1 },
     'help':{ coolTime:180, uses:1 },
 }
+
+//Administration tools - big ol' serious commands for managing big groups of people
+for(var i in adminCommands)
+    commands[i] = adminCommands[i];
 
 /*Private configuration - you can use lemonbot as a base for some of your own projects.
 Just edit this file and your own things will be included in the bot. This is convenient for something like heroku deployment

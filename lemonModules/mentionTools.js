@@ -73,4 +73,11 @@ function channelParser(str){
     return results;
 }
 
-if(typeof module == 'object' && typeof module.exports == 'object') module.exports = { replaceMentionTags:replaceMentionTags, channelParser:channelParser };
+var quoteParser = str=> [...str.matchAll(/"[A-Za-z0-9]*"/g)].map(e=>e[0].split('"')[1]);
+
+if(typeof module == 'object' && typeof module.exports == 'object')
+    module.exports = { 
+        replaceMentionTags:replaceMentionTags, 
+        channelParser:channelParser,
+        quoteParser:quoteParser
+    };

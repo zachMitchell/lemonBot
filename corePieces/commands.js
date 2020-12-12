@@ -5,7 +5,6 @@
 //Load the modules!
 var lemonModules = {};
 var messageOverflow = require('./messageOverflow');
-var adminTools = require('./adminTools');
 
 //These are file names you can find from lemonModules. For example: eMark.js would be eMark here.
 var moduleList = [
@@ -15,9 +14,7 @@ var moduleList = [
     'eMark',
     'rylan',
     'rylansWisdom',
-    'shuffle',
-    //Admin stuff
-    'mentionTools'
+    'shuffle'
 ]
 
 for(var i of moduleList)
@@ -39,16 +36,6 @@ var helpDescriptions = [
     ["shuf", "Randomize a list of things"],
     ["wisdom", "Recieve good advice from a wise man"]
 ];
-
-var adminHelpDesc = [
-    ['del','Remove messages from the channel you called this command from'],
-    ['move','Takes messages out of this channel and puts them in another of your choice'],
-    ['mute','Mutes an entire voice channel, if you add a number it will stay muted for that number in minutes'],
-    ['umute','Un-mutes an entire channel']
-]
-
-//Timers that are ticking when somebody runs the /muteall command. They are here to manually unmute everyone.
-var voiceStates = {};
 
 var commands = {
     'age':(m,args)=>{
@@ -175,173 +162,6 @@ var commands = {
             resultStr+='`\n'+'/'+i[0]+'` - '+i[1];
 
         m.channel.send(resultStr);
-    },
-
-    //Administrator commands
-    'adminhelp':m=>{
-        if(!adminTools.isAdmin(m)) return;
-        
-        var resultStr = 'Please note that these commands do not have cooldown... **Use responsibly!**\n';
-        for(var i of adminHelpDesc)
-            resultStr+='`\n'+'/'+i[0]+'` - '+i[1];
-        m.channel.send(resultStr);
-    },
-    'del':(m,args)=>{
-        if(!adminTools.isAdmin(m)) return;
-
-        if(args.length == 1){
-            m.reply(`Example usage:
-            Delete the last 5 messages:
-            \`/del 5\`
-            
-            Delete messages from @joeSchmoe within a 10 message radius
-            \`/del 10 @joeSchmoe\`
-            
-            Delete messages from multiple people within a 50 message radius, as long as they said "pog"
-            \`/del @joe @caleb "pog" 50\``);
-            return;
-        }
-        
-        var currNum = 1;
-        //Scan through all args to find numbers
-        for(var i of args)
-            if(!isNaN(i)) currNum = i*1;
-        
-        currNum++;
-
-        //Go through the messasge to see if there was a specified phrase to look for
-        var phraseList = [];
-        //Remove quotation marks in the search results
-        for(var i of [...m.content.matchAll(/"[A-Za-z0-9]*"/g)]) phraseList.push(i[0].split('"')[1]);
-
-        adminTools.queryMessages(m,currNum,phraseList,messages=>{
-            m.channel.bulkDelete(messages);
-        });
-    },
-    'move':(m,args)=>{
-        if(!adminTools.isAdmin(m)) return;
-
-        //Totally original help page and totally not 100% copied from /del
-        if(args.length == 1){
-            m.reply(`Example usage:
-            move the last 5 messages:
-            \`/move 5 #burgers-and-fries\`
-            
-            Move messages from @joeSchmoe within a 10 message radius
-            \`/move 10 @joeSchmoe #burgers-and-fries\`
-            
-            Move messages from multiple people within a 50 message radius, as long as they said "pog"
-            \`/move @joe @caleb "pog" 50 #burgers-and-fries\``);
-            return;
-        }
-        
-        var currNum = 1;
-        //Scan through all args to find numbers
-        for(var i of args)
-            if(!isNaN(i)) currNum = i*1;
-        
-        currNum++;
-
-        //Go through the messasge to see if there was a specified phrase to look for
-        var phraseList = [];
-        //Remove quotation marks in the search results
-        for(var i of [...m.content.matchAll(/"[A-Za-z0-9]*"/g)]) phraseList.push(i[0].split('"')[1]);
-
-        //Grab target channel
-        var channel = lemonModules.mentionTools.channelParser(m.content)[0];
-        if(!channel){
-            m.reply('Specify a channel to move messages to (e.g #burgers-and-fries)');
-            return;
-        }
-
-        var channelObj = m.channel.guild.channels.cache.get(channel);
-        if(!channelObj.isText()){
-            m.reply('**Error: not a text channel!**');
-            return;
-        }
-
-        adminTools.queryMessages(m,currNum,phraseList,messages=>{
-            //Copy all messages
-            var finalText = messages.map(e=>'<@'+e.author.id+'> '+e.content).reverse();
-            for(var i of finalText) channelObj.send(i);
-            m.channel.bulkDelete(messages);
-        });
-    },
-    'mute':(m,args)=>{
-        if(!adminTools.isAdmin(m)) return;
-        //First find the voice channel in the args, it should be in quotes
-        var channelName,
-            muteLimit = 5;
-        try{
-            channelName = [...m.content.matchAll(/"[A-Za-z0-9]*"/g)][0][0].split('"')[1];
-        }
-        catch(e){
-            m.reply('Specify the channel of choice within quotation marks (e.g "Rylans png fest")');
-            return;
-        }
-        
-        var targetChannel;
-        //next, poll through all voice channel names; the first result get's muted
-        
-        for(var i of m.channel.guild.channels.cache){
-            if(i[1].name == channelName && i[1].type == 'voice'){
-                targetChannel = i[1];
-                break;
-            }
-        }
-
-        if(!targetChannel){
-            m.reply('*Error: Couldn\'t find that voice channel :/ ('+channelName+')*');
-            return;
-        }
-
-        //Skim through all numbers to find mute limit
-        for(var i of args)
-            if(!isNaN(i)) muteLimit = i*1;
-
-        //Mute Everyone and set a time limit:
-        //set an address based on channel id
-        voiceStates[targetChannel.id] = [0,targetChannel];
-        for(var i of targetChannel.members){
-            i[1].voice.setMute(true);
-        }
-        voiceStates[targetChannel.id][0] = setTimeout(()=>commands.umute(targetChannel),muteLimit*1000*60);
-
-    },
-    'umute':(m,args)=>{
-        if(!adminTools.isAdmin(m)) return;
-        //m can be two things, a message or a channel depending on how it was invoked.
-        var targetChannel;
-        if(!m.content) targetChannel = m;
-        else{
-            //run through the parse dance
-            try{
-                channelName = [...m.content.matchAll(/"[A-Za-z0-9]*"/g)][0][0].split('"')[1];
-            }
-            catch(e){
-                m.reply('Specify the channel of choice within quotation marks (e.g "Rylans png fest")');
-                return;
-            }
-            
-            var targetChannel;
-            //next, poll through all voice channel names; the first result get's muted
-            for(var i of m.channel.guild.channels.cache){
-                if(i[1].name == channelName && i[1].type == 'voice'){
-                    targetChannel = i[1];
-                    break;
-                }
-            }
-        }
-
-        //Unmute everybody
-        for(var i of targetChannel.members){
-            i[1].voice.setMute(false);
-        }
-        
-        if(voiceStates[targetChannel.id]){
-            clearTimeout(voiceStates[targetChannel.id][0]);
-            delete voiceStates[targetChannel.id];
-        }
     }
 
 }

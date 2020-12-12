@@ -1,3 +1,6 @@
+//Made by Zachary Mitchell in 2020!
+//Routine functions that could be used in more than one file.
+
 function isAdmin(m,sendErrMsg = true){
     //First off we need the author's ID
     var userId = m.author.id;
@@ -35,7 +38,27 @@ function queryMessages(m,quantity,phraseList,doneFunc = ()=>{}){
     });
 }
 
+//Simple polling function to find a target channel based on the string name
+function queryChannel(m,channelName,type = 'text',printErr = true){
+    
+    var targetChannel;
+
+    for(var i of m.channel.guild.channels.cache){
+        if(i[1].name == channelName && i[1].type == type){
+            targetChannel = i[1];
+            break;
+        }
+    }
+
+    if(!targetChannel){
+        if(printErr)
+            m.reply('*Error: Couldn\'t find that '+type+' channel :/ ('+channelName+')*');
+    }
+    else return targetChannel;
+}
+
 module.exports = {
     isAdmin:isAdmin,
-    queryMessages:queryMessages
+    queryMessages:queryMessages,
+    queryChannel:queryChannel
 }
