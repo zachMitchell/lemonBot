@@ -100,7 +100,7 @@ client.on('message',msg=>{
         var args = msg.content.split(' ');
         var actualCommand = args[0].substring(1);
 
-        if(commands[actualCommand]){
+        if(commands[actualCommand] && !msg.author.bot){
             //Setup command cooldown for this guild. If there's no config we have defaults
             var guild = msg.channel.guild;
             if(guild && !cooldownGroup[guild.id])
@@ -130,7 +130,7 @@ client.on('message',msg=>{
             // console.log(cooldownGroup);
         }
     }
-    else if(!gotCommand){
+    else if(!gotCommand && !msg.author.bot){
         var content = msg.content.toLowerCase();
         //Recurse through pre-determined chat responses
         for(var i in responses){
