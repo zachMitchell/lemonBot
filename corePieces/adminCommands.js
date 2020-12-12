@@ -7,7 +7,7 @@ var adminTools = require('./adminTools'),
     adminHelpDesc = [
         ['del','Remove messages from the channel you called this command from'],
         ['move','Takes messages out of this channel and puts them in another of your choice'],
-        ['mute','Mutes an entire voice channel, if you add a number it will stay muted for that number in minutes'],
+        ['mute','Mutes entire voice channels (or groups of), if you add a number it will stay muted for that number in minutes'],
         ['umute','Un-mutes an entire channel'],
         ['voisplit','Put everyone randomly (but evenly) into different voice channels'],
         ['raid','Move an entire voice channel into another channel']

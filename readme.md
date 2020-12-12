@@ -7,16 +7,16 @@ Lemonbot is a friendly all-around Discord bot that hosts a variety of tools and 
 ## Features
 
 Items straight from /help:
-* /age - Find out the age of two discord accounts
-* /back - !naidrocsid gnuoy eikooc trams a er'uoy yeh ho
-* /camel - typeLikeANerd
-* /creepy - tYpE lIkE a CrEePy PeRsOn
-* /dumbot - Ask an intelligent question
-* /e - b[e] r[e]sponsibl[e] with this on[e]
-* /math - Do Stonks
-* /rnd - Ask for a random number
-* /shuf - Randomize a list of things
-* /wisdom - Recieve good advice from a wise man
+* `/age` - Find out the age of two discord accounts
+* `/back` - !naidrocsid gnuoy eikooc trams a er'uoy yeh ho
+* `/camel` - typeLikeANerd
+* `/creepy` - tYpE lIkE a CrEePy PeRsOn
+* `/dumbot` - Ask an intelligent question
+* `/e` - b[e] r[e]sponsibl[e] with this on[e]
+* `/math` - Do Stonks
+* `/rnd` - Ask for a random number
+* `/shuf` - Randomize a list of things
+* `/wisdom` - Recieve good advice from a wise man
 
 And most importantly, a guy named Rylan
 
@@ -27,6 +27,14 @@ And most importantly, a guy named Rylan
     * Command groups - Commands can share the same settings and can even depend on eachother in that usage of one command can affect all the others cooldown wise.
 * Custom commands - Make lemonbot yours by adding custom commands and other functionality! To get started, visit [privateConfig.js](./privateConfig.js)
 * A base for other bots - Lemonbot provides (and already is!) a fast base for new command-based projects! If you want to go much further than using private commands, allot of technologies are ready to go and just about everything is module based. Lemonbot can't take the full credit though as so much of the versatility originates from the power of node.js and [Discord.js](https://discord.js.org/#/) So please check them out for more granularity and documentation!
+* An arsenal of commands - lemonbot comes with a powerful set of administration commands that allow filtering of text channels and moving everyone around do different voice channels! Straight from `/adminhelp`:
+
+* `/del` - *Remove messages from the channel you called this command from* - provides a powerful querying syntax that can allow you to grab very specific messages while leaving some out
+* `/move` - *Takes messages out of this channel and puts them in another of your choice* - uses the querying syntax of /del to allow granularity.
+* `/mute` - *Mutes entire voice channels (or groups of), if you add a number it will stay muted for that number in minutes*
+* `/umute` - *Un-mutes an entire channel or groups of channels.*
+* `/voisplit` - *Put everyone randomly (but evenly) into different voice channels* - if you have 6 users in one voice chat room and have two other chat rooms, this command will spread everyone out into groups of 2 amongst selected rooms.
+* `/raid` - *Move entire voice channels into another channel* - you can select multiple channels and group everyone into the last mentioned channel in the command.
 
 ## Deploying Lemonbot
 

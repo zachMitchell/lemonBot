@@ -23,6 +23,12 @@ var reactions = {
         'mecharm',
         'moneyface',
         'starstruck'
+    ],
+    jojoReference:[
+        'expressionless',
+        'eyeroll',
+        'lying',
+        'flushed'
     ]
 }
 
@@ -31,7 +37,15 @@ var responses = {
         rndAction(0,e=>m.reply(e),reactions.hi);
         // console.log(m);
     },
-    'pog':m=>rndAction(5,e=>m.react(emoji[e]),reactions.pog)
+    'pog':m=>rndAction(5,e=>m.react(emoji[e]),reactions.pog),
+    'jojo reference':m=>{
+        var chance = Math.floor(Math.random()*5);
+        if(chance === 0){
+            var selectedReaction = Math.floor(Math.random()*reactions.jojoReference.length);
+            m.react(emoji[reactions.jojoReference[selectedReaction]]);
+        }
+        else if(chance === 4) m.reply('Yare, yaradaze...');
+    }
 }
 
 var commandConfig = require('./corePieces/commands.js');
