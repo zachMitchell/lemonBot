@@ -60,7 +60,7 @@ Lemonbot cannot run without a bot account, so navigate to discord's [Developer p
 
 When all of that is said and done, navigate to this link to put lemonbot on your server:
 
-https://discord.com/oauth2/authorize?client_id=yourClientIdHere&scope=bot&permissions=10272
+https://discord.com/oauth2/authorize?client_id=yourClientIdHere&scope=bot&permissions=20981760
 
 It should ask which discord server to add this to; go through the recaptcha and your done!
 

@@ -25,7 +25,8 @@ var adminTools = require('./adminTools'),
         \`/@! 10 @joeSchmoe\`
         
         @~ messages from multiple people within a 50 message radius, as long as they said "pog"
-        \`/@! @joe @caleb "pog" 50\``
+        \`/@! @joe @caleb "pog" 50\``,
+        voicePermissions:m=>m.reply("Sorry, In order to do voice channel commands I need the following permissions: Mute Members, Move Members")
     };
 
 //Timers that are ticking when somebody runs the /muteall command. They are here to manually unmute everyone.
@@ -162,7 +163,7 @@ var commands = {
         for(var targetChannel of channels){
             voiceStates[targetChannel.id] = [0,targetChannel,channelTotalObj];
             for(var i of targetChannel.members){
-                i[1].voice.setMute(true);
+                i[1].voice.setMute(true).then(undefined,()=>overUsedVars.voicePermissions(m));
             }
             //Theoretically we could group all of these into one timeout, that would be cool
             voiceStates[targetChannel.id][0] = universalTimeout;
@@ -185,7 +186,7 @@ var commands = {
         for(let targetChannel of channels){
             //Unmute everybody
             for(var i of targetChannel.members){
-                i[1].voice.setMute(false);
+                i[1].voice.setMute(false).then(undefined,()=>overUsedVars.voicePermissions(m));
             }
             
             if(voiceStates[targetChannel.id]){
@@ -221,7 +222,7 @@ var commands = {
             for(var i = 0; i < channels.length;i++){
                 for(var j = 0; j < split; j++ ){
                     //member joins
-                    members[members.length-1].voice.setChannel(channels[i],reasonStr);
+                    members[members.length-1].voice.setChannel(channels[i],reasonStr).then(undefined,()=>overUsedVars.voicePermissions(m));
                     members.pop();
                 }
             }
@@ -229,7 +230,7 @@ var commands = {
         else{
             //Just put members in random rooms
             for(var i = 0; members.length; i++){
-                members[members.length-1].voice.setChannel(channels[i],reasonStr);
+                members[members.length-1].voice.setChannel(channels[i],reasonStr).then(undefined,()=>overUsedVars.voicePermissions(m));
                 members.pop();
             }
         }
@@ -257,11 +258,11 @@ var commands = {
         for(var i of channels)
             members.push(...[...i.members].map(e=>e[1]));
 
-        console.log(members);
+        // console.log(members);
         var insertedMembers = [];
         for(var i of members){
             if(insertedMembers.indexOf(i) == -1){
-                i.voice.setChannel(channels[channels.length-1],'Lemonbot raid!');
+                i.voice.setChannel(channels[channels.length-1],'Lemonbot raid!').then(undefined,()=>overUsedVars.voicePermissions(m));
                 insertedMembers.push(i);
             }
         }
