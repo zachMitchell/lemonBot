@@ -5,7 +5,7 @@ Lemonbot is capable of many commands. The admin commands specifically are differ
 1. They have no cooldown
 1. They are reserved only for the highest discord server rank "Administrator"
 
-These commands are capable to destroying a server's message history if not careful, so to properly use them, make sure you have practice an environment where it won't cause major damage.
+These commands are capable of destroying a server's message history if not careful, so to properly use them, make sure you have a practice environment where it won't cause major damage.
 
 ## Initial setup
 
@@ -36,9 +36,9 @@ Probably the simplest example, delete 10 messages starting with the most recent.
 ```
 /del @cottonEyeJoe 5
 ```
-This reads slightly differently. Instead of directly being 5 messages, it now says "delete @cottonEyeJoe's messages within a 5 message radius"
+This reads slightly differently. Instead of directly being 5 messages, it now says "delete @cottonEyeJoe's messages within a 5 message range"
 
-In other words, the number `5` is how far you want to search for things to delete. If there are `4` messages from @cottonEyeJoe from your radius of 5, only those 4 will be removed.
+In other words, the number `5` is how far you want to search for things to delete. If there are `4` messages from @cottonEyeJoe from your range of 5, only those 4 will be removed.
 
 Here's one more main example:
 ```
@@ -49,9 +49,9 @@ Here's one more main example:
 
 Jokes aside this was to demonstrate you can place items anywhere in the command and it will still work. Since everything can be distinguished by some property (keywords having "quotations", numbers being numbers and mentions having @'s) it's easy to take it all in via strange fashion. This should help speed things up and that way you don't have to worry when in a rush.
 
-Anyway, this reads as "within a 20 message radius, remove messages from @cottonEyeJoe and @ironMouthSteve which have the keywords 'blood', 'guns' or 'romance'". Emphasis on **or**. Not all of these words need to be in the message to be removed, just one of them.
+Anyway, this reads as "within a 20 message range, remove messages from @cottonEyeJoe and @ironMouthSteve which have the keywords 'blood', 'guns' or 'romance'". Emphasis on **or**. Not all of these words need to be in the message to be removed, just one of them.
 
-Good work! You read how to use `/del`! Ready for `/copy`?! It's a hefty one. You sure? Ok here it goes:
+Good work, you know how to use `/del`! Ready for `/copy`?! It's a hefty one. You sure? Ok here it goes:
 
 *PSYCHE* - it's the same patterns as `/del` XD
 
@@ -135,7 +135,7 @@ The command is great for random match-making. If there's a odd-number of people 
 
 The wording for this command was sortof inspired by twitch. On twitch, a raid is a way to move all your viewers to another channel. A boost of viewership for that matter.
 
-On lemonbot `/raid` moves everyone from one or more channels to a specific channel. I thought it would be a cooler name than /hurd... baAaAaH.
+On lemonbot `/raid` moves everyone from one or more channels to a specific channel. I thought it would be a cooler name than /herd... baAaAaH.
 
 Raid syntax looks like this:
 
