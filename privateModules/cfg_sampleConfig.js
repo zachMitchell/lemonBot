@@ -20,9 +20,8 @@ var debugSymbol = "!";
 //Your list loads here:
 var privateModules = {};
 
-//replace "sampleConfig", with a folder made for this config file (...or whatever)"
 for(var i of moduleList)
-    privateModules[i] = require('./sampleConfig/'+i+'.js');
+    privateModules[i] = require('./moduleFolder/'+i+'.js');
 
 delete moduleList;
 
