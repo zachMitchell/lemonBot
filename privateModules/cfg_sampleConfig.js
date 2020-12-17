@@ -21,7 +21,7 @@ var debugSymbol = "!";
 var privateModules = {};
 
 for(var i of moduleList)
-    // privateModules[i] = require('./sampleConfig/'+i+'.js');
+    privateModules[i] = require('./sampleConfig/'+i+'.js');
 
 delete moduleList;
 
