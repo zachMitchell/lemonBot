@@ -25,7 +25,8 @@ And most importantly, a guy named Rylan
 ## Administrative & development features
 * Command cooldowns - every default command in lemonbot's arsenal has a way of knowing how often each discord member uses a command. If somebody uses that command too much, lemonbot will get tired and a cooldown is set for that user. For example, `/help` can be used once every 3 minutes and `/math` can be used 3 times every 25 seconds.
     * Command groups - Commands can share the same settings and can even depend on eachother in that usage of one command can affect all the others cooldown wise.
-* Custom commands - Make lemonbot yours by adding custom commands and other functionality! To get started, visit [privateConfig.js](./privateConfig.js)
+* Custom commands - Make lemonbot yours by adding custom commands and other functionality! To get started, visit [cfg_sampleConfig.js](./privateConfig/cfg_sampleConfig.js)
+    * Custom configuration can go well beyond this file, anything with the pattern `cfg_nameHere.js` will be read as well, allowing for private configuration to be super modular.
 * A base for other bots - Lemonbot provides (and already is!) a fast base for new command-based projects! If you want to go much further than using private commands, allot of technologies are ready to go and just about everything is module based. Lemonbot can't take the full credit though as so much of the versatility originates from the power of node.js and [Discord.js](https://discord.js.org/#/) So please check them out for more granularity and documentation!
 * An arsenal of commands - lemonbot comes with a powerful set of administration commands that allow filtering of text channels and moving everyone around do different voice channels! Straight from `/adminhelp`:
 
@@ -50,13 +51,13 @@ Every lemonbot deployment requires the minimum steps:
 * `npm install`
 * Creating a bot and bot token
 
-Lemonbot is OS independant because of node.js. To install it, visit (node.js' website)[https://nodejs.org] to put it on your machine, or if you have debian/ubuntu linux:
+Lemonbot is OS independant because of node.js. To install it, visit [node.js' website](https://nodejs.org) to put it on your machine, or if you have debian/ubuntu linux:
 
 `sudo apt install node`
 
-Next, clone this repository. Navigate to this folder via command line /terminal and type `npm install`. This will install discord.js in the folder that holds this project.
+Next, clone this repository. Navigate to this folder via command line / terminal and type `npm install`. This will install discord.js in the folder that holds this project.
 
-Lemonbot cannot run without a bot account, so navigate to discord's [Developer portal](https://discord.com/developers/applications) and make an app. Inside you'll find the ability to also make a bot. From here, you can grab the token, which you will need to place inside the [Private Config](./privateConfig.js). Also look for *your client id* as well for lemonbot, you will need to put it in the url we're making below
+Lemonbot cannot run without a bot account, so navigate to discord's [Developer portal](https://discord.com/developers/applications) and make an app. Inside you'll find the ability to also make a bot. From here, you can grab the token, which you will need to place inside the [token.js](./token.js). Also look for *your client id* as well for lemonbot, you will need to put it in the url we're making below
 
 When all of that is said and done, navigate to this link to put lemonbot on your server:
 

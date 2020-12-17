@@ -2,12 +2,11 @@
 This file can be constructed by you to make lemonbot yours! Fill in the blanks for things like new commands, custom responses and additions to the help menu.
 The file overall is your sandbox, do whatever you like such as importing modules.
 
-If you are deploying from heroku, this file is your friend so you can merge your changes whenever the master branch gets an update*/
+If you are deploying from heroku, this file is your friend so you can merge your changes whenever the master branch gets an update
+
+To use the debugSymbol in place of /, run lemonbot with this command: "node -p=sampleConfig"*/
 
 //////////////////
-
-//The most important piece: your authentication token. Use this so that your discord bot can log into it's account
-const token = '';
 
 //Custom imports - private modules can come from wherever you like, in this case we're importing from ./privateModules
 //example: moduleList = ['file1','file2']; //file1.js and file2.js respectively
@@ -15,12 +14,14 @@ var moduleList = [
     // 'sampleModule',
 ];
 
+//Debug Symbol - use this as a replacement for / so you don't step on another dev's toes.
+var debugSymbol = "!";
 
 //Your list loads here:
 var privateModules = {};
 
 for(var i of moduleList)
-    privateModules[i] = require('./privateModules/'+i+'.js');
+    // privateModules[i] = require('./sampleConfig/'+i+'.js');
 
 delete moduleList;
 
@@ -101,7 +102,7 @@ var cooldowns = {
 
 //You don't really need to touch this part
 module.exports = {
-    token:token,
+    debugSymbol:debugSymbol,
     helpDescriptions:helpDescriptions,
     commands:commands,
     responses:responses,

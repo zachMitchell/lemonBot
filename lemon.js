@@ -84,7 +84,9 @@ for(var i in adminCommands)
 /*Private configuration - you can use lemonbot as a base for some of your own projects.
 Just edit this file and your own things will be included in the bot. This is convenient for something like heroku deployment
 where you can just pull in the lastest changes from the community without much hastle*/
-var privateConfig = require('./privateConfig');
+
+var privateCore = require('./privateCore');
+var privateConfig = privateCore.resultObject;
 
 //Merge commands and the help strings
 commandConfig.helpDescriptions.push(...privateConfig.helpDescriptions);
@@ -107,6 +109,18 @@ for(var i in privateConfig.cooldowns){
             cooldownDefaults[i][j] = privateConfig.cooldowns[i][j];
     }
 }
+
+//Finally, take a look at the launching arguments to see if there's a new symbol to execute commands
+var commandSymbol = '/';
+for(var i of process.argv){
+    if(i.indexOf('-d=') == 0){
+        var key = i.split('-d=')[1];
+        if(privateCore.collectedModules[key])
+            commandSymbol = privateCore.collectedModules[key].debugSymbol;
+        else console.warn('Could not find the config matching:"'+key+'". Gonna default to the last symbol defined ('+commandSymbol+')');
+    }
+}
+
 //End Private config
 
 client.on('ready',()=>console.log('Im in! ',client.user.tag));
@@ -114,7 +128,7 @@ client.on('ready',()=>console.log('Im in! ',client.user.tag));
 client.on('message',msg=>{
     var gotCommand = false;
     //Commands should be easier to run though since we're using associative arrays to determine if the command is even there
-    if('/\\'.indexOf(msg.content[0]) > -1){
+    if(msg.content[0] == commandSymbol){
         //Check to see what command we got if at all:
         var args = msg.content.split(' ');
         var actualCommand = args[0].substring(1);
@@ -161,4 +175,4 @@ client.on('message',msg=>{
     }
 });
 
-client.login(privateConfig.token);
+client.login(require('./token.js'));
