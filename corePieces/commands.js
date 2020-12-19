@@ -61,16 +61,13 @@ var commands = {
     },
     'back':(m,args)=>{
         //gorgeous
-        m.reply(args.slice(1).join(' ').split('').reverse().join(''));
-        m.delete();
+        m.reply(args.slice(1).join(' ').split('').reverse().join('')).then(()=>m.delete());
     },
     'camel':(m,args)=>{
-        m.reply(lemonModules.camelCase(args.slice(1)));
-        m.delete();
+        m.reply(lemonModules.camelCase(args.slice(1))).then(()=>m.delete());
     },
-    'creepy':m=>{
-        m.reply(lemonModules.creepyCase(m.content.split('/creepy')[1]));
-        m.delete();
+    'creepy':(m,args)=>{
+        m.reply(lemonModules.creepyCase(args.slice(1).join(''))).then(()=>m.delete());
     },
     'dumbot':m=>{
         var result = lemonModules.dumbotModule();
@@ -116,7 +113,7 @@ var commands = {
             m.channel.send(Math.floor(Math.random()*args[1])+1);
         else m.channel.send('Give me a number! Like this: /rnd 5');
     },
-    'shuf':m=>{
+    'shuf':(m,args)=>{
 
         //Help messages
         var mainHelp = `shuf gives everything you threw at it back at you but in a random order
@@ -128,7 +125,7 @@ var commands = {
         Separate everything by commas and enclose your whole list inside these: \`[]\``;
 
         //Accept either a javaScript array or a list of items separated by comma
-        var shufStr = m.content.split('/shuf')[1].substring(1);
+        var shufStr = args.slice(1).join(' ');
         var itemsToShuf = [];
 
         //If this is an array, try to parse it:

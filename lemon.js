@@ -128,10 +128,10 @@ client.on('ready',()=>console.log('Im in! ',client.user.tag));
 client.on('message',msg=>{
     var gotCommand = false;
     //Commands should be easier to run though since we're using associative arrays to determine if the command is even there
-    if(msg.content[0] == commandSymbol){
+    if(msg.content.indexOf(commandSymbol) === 0){
         //Check to see what command we got if at all:
         var args = msg.content.split(' ');
-        var actualCommand = args[0].substring(1);
+        var actualCommand = args[0].substring(commandSymbol.length);
 
         if(commands[actualCommand] && !msg.author.bot){
             //Setup command cooldown for this guild. If there's no config we have defaults

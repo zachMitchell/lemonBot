@@ -35,15 +35,16 @@ var voiceStates = {};
 //This really should be in another file somewhere :P
 //Anyway, this fella takes in a message, and based on items in quotation marks "channel name" finds all channels with that content.
 function findChannelMacro(m){
+    var results = [];
+    
     //run through the parse dance
     var channelNames = mentionTools.quoteParser(m.content);
     if(!channelNames.length) {
         m.reply(overUsedVars.channelErr);
-        return;
+        return results;
     }
     
     //next, poll through all voice channel names; the first result get's muted
-    var results = [];
     for(var i of channelNames){
         var item = adminTools.queryChannel(m,i,'voice');
         if(item) results.push(item);
@@ -51,7 +52,7 @@ function findChannelMacro(m){
 
     if(!results.length){
         m.reply(overUsedVars.channelNotFound);
-        return;
+        return results;
     }
 
     return results;
