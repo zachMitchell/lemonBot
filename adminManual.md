@@ -84,6 +84,23 @@ Example usage:
 
 Voice channels "saloon" and "spagetti and meatballs" will be muted for 2 minutes. If a number isn't provided, the default is 5.
 
+You can also add a timestamp instead of a regular number so you can have hours, minutes and seconds.
+
+All of these turn into valid timestamps:
+```
+two minutes, one second
+/mute "saloon" 2:1
+
+1 hour, 5 minutes and 3 seconds
+/mute "saloon" 1:5:3
+
+30 seconds
+/mute "saloon" :30
+
+90 minutes and 8 seconds
+/mute "saloon" 90:08
+```
+
 For `/umute`, the syntax is the same but numbers aren't used
 
 ```

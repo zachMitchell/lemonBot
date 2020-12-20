@@ -4,6 +4,7 @@
 var adminTools = require('./adminTools'),
     mentionTools = require('../lemonModules/mentionTools'),
     shuffle = require('../lemonModules/shuffle'),
+    timeTools = require('../lemonModules/timeTools'),
     adminHelpDesc = [
         ['del','Remove messages from the channel you called this command from'],
         ['move','Takes messages out of this channel and puts them in another of your choice'],
@@ -140,7 +141,7 @@ var commands = {
     'mute':(m,args)=>{
         if(!adminTools.isAdmin(m)) return;
         //First find the voice channel in the args, it should be in quotes
-        let muteLimit = 5,
+        let muteLimit = 5000*60, //5 minutes
             channels = findChannelMacro(m);
         
         /*It's possible to mute multiple channels at once, un-muting however has been a huge pain when trying to async different instances.
@@ -153,12 +154,16 @@ var commands = {
 
         //Skim through all numbers to find mute limit
         for(var i of args)
-            if(!isNaN(i)) muteLimit = i*1;
+            if(!isNaN(i)) muteLimit = i*1000*60;
 
+        //If we find a timestamp, replace the number with the last mentioned timestamp
+        var timeStamps = timeTools.strToTimeObjs(args);
+        if(timeStamps.length)
+            muteLimit = timeTools.timeToSeconds(timeStamps[timeStamps.length-1]) * 1000;
         
         //The total is in an object to use js' reference abilities
         var channelTotalObj = {total:channels.length};
-        var universalTimeout = setTimeout(()=>commands.umute(channels),muteLimit*1000*60);
+        var universalTimeout = setTimeout(()=>commands.umute(channels),muteLimit);
         //Mute Everyone and set a time limit:
         //set an address based on channel id
         for(var targetChannel of channels){

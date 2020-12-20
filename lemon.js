@@ -3,10 +3,11 @@
 
 //His backbone will be discord.js:
 const Discord = require('discord.js');
-const client = new Discord.Client();
-const emoji = require('./corePieces/emoji');
-var rndAction = require('./lemonModules/rndAction');
-var adminCommands = require('./corePieces/adminCommands');
+const client = new Discord.Client(),
+    emoji = require('./corePieces/emoji'),
+    rndAction = require('./lemonModules/rndAction')
+    adminCommands = require('./corePieces/adminCommands'),
+    timeTools = require('./lemonModules/timeTools');
 
 //Reactions are the way lemonbot responds back whether that be an emoji or a message to users.
 var reactions = {
@@ -157,7 +158,7 @@ client.on('message',msg=>{
                 msg.reply('aww, looks like this command is turned off :/');
             //If the user hasn't tried typing the command twice, show this message if cooldown is present
             else if(!cooldownResults[1])
-                msg.reply('*huff*, one second; I need a breather. Give me '+cooldownResults[2]+' more seconds!');
+                msg.reply('*huff*, one second; I need a breather. Give me '+timeTools.timeToEnglish(timeTools.secondsToTime(cooldownResults[2]))+'!');
             //If the user tried again, don't respond back.
             
             // console.log(cooldownGroup);
