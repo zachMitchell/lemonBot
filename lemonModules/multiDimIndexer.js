@@ -29,7 +29,7 @@ function multiDimIndexer(obj){
 
         for(var i of this.keyMap){
             //We subtract everytime the index is greater than the length in order to get a possible value
-            if(index > i[1])
+            if(index > i[1]-1)
                 index-=i[1];
             else{
                 result = [this.obj[i[0]][index],i[0],index];
