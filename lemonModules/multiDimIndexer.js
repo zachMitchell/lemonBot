@@ -32,7 +32,7 @@ function multiDimIndexer(obj){
             if(index > i[1])
                 index-=i[1];
             else{
-                result = [i[0],this.obj[i[0]][index]];
+                result = [this.obj[i[0]][index],i[0],index];
                 break;
             }
         }
