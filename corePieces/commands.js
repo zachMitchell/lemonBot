@@ -67,7 +67,7 @@ var commands = {
         m.reply(lemonModules.camelCase(args.slice(1))).then(()=>m.delete());
     },
     'creepy':(m,args)=>{
-        m.reply(lemonModules.creepyCase(args.slice(1).join(''))).then(()=>m.delete());
+        m.reply(lemonModules.creepyCase(args.slice(1).join(' '))).then(()=>m.delete());
     },
     'dumbot':m=>{
         var result = lemonModules.dumbotModule();

@@ -3,7 +3,7 @@
 Lemonbot is capable of many commands. The admin commands specifically are different than standard commands however in that:
 
 1. They have no cooldown
-1. They are reserved only for the highest discord server rank "Administrator"
+1. They are reserved only for server members with permissions required to run each command.
 
 These commands are capable of destroying a server's message history if not careful, so to properly use them, make sure you have a practice environment where it won't cause major damage.
 
@@ -13,16 +13,21 @@ To use these commands, you either need to be the server owner, or somehow have a
 
 Non-admins will receive this message when launching an admin command:
 
-`Sorry, it looks like only Admins can use this command!`
+`Sorry, it looks like there aren't any admin commands that can be run. Contact the local admin to get some perms!`
+
+Members without permissions can see which ones they don't have by running any command they wish to run. This will work twice before executing a 1 hour cooldown for that member. Members with proper perms will override this cooldown.
 
 # Commands
 
 ## `/adminhelp`
 
-If for some reason you can't find this document or need a quick set of tips, this command is here to provide quick descriptions of every command you see below. No special syntax is needed to use it.
+**Required Perms: None**
+
+If for some reason you can't find this document or need a quick set of tips, this command is here to provide quick descriptions of every command your mod has permission to use. No special syntax is needed to use it.
 
 ## `/del` & `/move`
 
+**Required Perms: Manage Messages**
 
 `/del` is capable of deleting up to 99 messages at one time (+1 for deleting the command itself). These messages can be filtered out by who sent it, as well as the contents.
 
@@ -68,6 +73,7 @@ That's literally it. The only different item is the target channel you wish to s
 Well done! That's it for `/del` and `/copy`
 
 ## `/mute & /umute`
+**Required Perms: Mute Members**
 
 These are fairly simple to use. As emphasized by the names themselves, the commands' purposes are to mute and unmute voice channels.
 
@@ -113,6 +119,8 @@ This will unmute "saloon" before it's time is done. If there were any people man
 
 ## `/voisplit`
 
+**Required Perms: Move Members**
+
 This is an interesting command, it takes everyone from a single voice channel, then splits everyone out into random groups depending on how many channels you add to the command.
 
 Here's an example command:
@@ -149,6 +157,8 @@ Members would then be dispersed evenly, but you don't know who you will be paire
 The command is great for random match-making. If there's a odd-number of people there will be at least one extra member in one room. If there are fewer members than there are rooms specified, one member will go to a designated room.
 
 ## `/raid`
+
+**Required Perms: Move Members**
 
 The wording for this command was sortof inspired by twitch. On twitch, a raid is a way to move all your viewers to another channel. A boost of viewership for that matter.
 
