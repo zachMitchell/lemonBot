@@ -110,6 +110,13 @@ var commands = {
         else m.channel.send(Function('return '+mathStr)());
 
     },
+    'mock':msg=>{
+        msg.channel.messages.fetch({limit:2}).then(e=>{
+            creepyContent = lemonModules.creepyCase([...e.values()][1].content);
+            msg.channel.send('https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/mocking-spongebob-1556133078.jpg \n' + creepyContent);
+        });
+    },
+
     'rylan':m=>m.channel.send(lemonModules.rylan()),
     'rnd':(m,args)=>{
         if(!isNaN(args[1]))
