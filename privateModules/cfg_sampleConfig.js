@@ -4,7 +4,7 @@ The file overall is your sandbox, do whatever you like such as importing modules
 
 If you are deploying from heroku, this file is your friend so you can merge your changes whenever the master branch gets an update
 
-To use the debugSymbol in place of /, run lemonbot with this command: "node -p=sampleConfig"*/
+To use the debugSymbol in place of /, run lemonbot with this command: "node -d=sampleConfig"*/
 
 //////////////////
 

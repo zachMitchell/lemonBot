@@ -1,31 +1,51 @@
 //Made by Zachary Mitchell in 2020!
 //Routine functions that could be used in more than one file.
 
-function isAdmin(m,sendErrMsg = true){
-    //First off we need the author's ID
-    var userId = m.author.id;
-    var admin = false;
-
-    //poll through all roles
-    for(var i of m.channel.guild.roles.cache){
-        if(i[1].permissions.has('ADMINISTRATOR')){
-            //We got a juicy one, now check if said user is in this role
-            for(var j of i[1].members){
-                if(j[1].user.id == userId){
-                    admin = true;
-                    break;
-                }
-            }
-            if(admin) break;
-        }
+//Takes a list of items with this format "HEY_THERE" and converts it to "Hey There"
+function underScoreDeCap(){
+    var results = [];
+    for(var i of arguments){
+        var resStr = '';
+        for(var j of i.split('_'))
+            resStr += (resStr.length?' ':'') + j[0].toUpperCase() + j.substring(1).toLowerCase();
+        
+        results.push(resStr);
     }
-
-    if(!admin && sendErrMsg) sendErr(m);
-    return admin;
+    
+    return results;
 }
 
-function sendErr(m,msg = ''){
-    m.reply(msg?msg:'Sorry, it looks like only Admins can use this command!');
+//If the user that sent the message has the correct permissions, return true
+//useOr will cause this to return true if you have at least one permission
+function checkPerms(m,permsList = [],useOr = false ,printErr = true){
+    var endResult = true;
+    var permsResults = {
+        good:[],
+        bad:[]
+    }
+
+    if(!permsList.length){
+        console.warn('No permissions specified, returning true...');
+        return endResult;
+    }
+
+    for(var i of permsList)
+        permsResults[m.member.permissions.has(i)?'good':'bad'].push(i);
+
+    // console.log(permsList,permsResults);
+    
+    if(useOr && !permsResults.good.length || !useOr && permsResults.bad.length)
+        endResult = false;
+    
+    if(!endResult && printErr)
+        printPermsErr(m,permsResults);
+
+    return [endResult,permsResults];
+}
+
+function printPermsErr(m,permsResults){
+    var haveStr = permsResults.good.length? '\nYou have: `'+underScoreDeCap(...permsResults.good)+'`':'';
+    m.reply('Sorry, but it looks like you need more permissions to run this command..'+haveStr+"\nYou need: `"+ underScoreDeCap(...permsResults.bad)+'`');
 }
 
 function queryMessages(m,quantity,phraseList,doneFunc = ()=>{}){
@@ -58,7 +78,8 @@ function queryChannel(m,channelName,type = 'text',printErr = true){
 }
 
 module.exports = {
-    isAdmin:isAdmin,
+    checkPerms:checkPerms,
+    printPermsErr:printPermsErr,
     queryMessages:queryMessages,
     queryChannel:queryChannel
 }

@@ -73,7 +73,7 @@ function channelParser(str){
     return results;
 }
 
-var quoteParser = str=> [...str.matchAll(/"[A-Za-z0-9]*"/g)].map(e=>e[0].split('"')[1]);
+var quoteParser = str=> [...str.matchAll(/"[A-Za-z0-9\ ]*"/g)].map(e=>e[0].split('"')[1]);
 
 if(typeof module == 'object' && typeof module.exports == 'object')
     module.exports = { 
