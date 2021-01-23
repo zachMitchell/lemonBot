@@ -2,7 +2,7 @@
 //Holy cow admin tools are getting huge; guess it's time for a dedicated file!
 
 var adminTools = require('./adminTools'),
-    mentionTools = require('../lemonModules/mentionTools'),
+    mentionTools = require('./mentionTools'),
     shuffle = require('../lemonModules/shuffle'),
     timeTools = require('../lemonModules/timeTools'),
     adminHelpDesc = [

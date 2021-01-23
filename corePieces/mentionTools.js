@@ -75,9 +75,20 @@ function channelParser(str){
 
 var quoteParser = str=> [...str.matchAll(/"[A-Za-z0-9\ ]*"/g)].map(e=>e[0].split('"')[1]);
 
+function clearMentions(str){
+    var mentionTypes = ['<@','<@!','<@&'];
+    return str.split(' ').filter(e=>{
+        for(var i of mentionTypes)
+            if(e.indexOf(i) > -1) return '';
+                
+        return e;
+    }).join(' ');
+};
+
 if(typeof module == 'object' && typeof module.exports == 'object')
     module.exports = { 
         replaceMentionTags:replaceMentionTags, 
         channelParser:channelParser,
-        quoteParser:quoteParser
+        quoteParser:quoteParser,
+        clearMentions:clearMentions
     };

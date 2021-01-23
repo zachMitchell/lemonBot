@@ -9,7 +9,12 @@ const client = new Discord.Client(),
     adminCommands = require('./corePieces/adminCommands'),
     timeTools = require('./lemonModules/timeTools'),
     {checkPerms, printPermsErr} = require('./corePieces/adminTools'),
-    respondToBots = process.argv.indexOf('-b') > -1; //If this flag is toggled, listen to bots
+    respondToBots = process.argv.indexOf('-b') > -1, //If this flag is toggled, listen to bots
+    sci = require('./stateful/stateCommandInterface');
+
+var commandConfig = require('./corePieces/commands.js');
+var commands = commandConfig.commands,
+    cooldown = require('./corePieces/cooldown.js');
 
 //Reactions are the way lemonbot responds back whether that be an emoji or a message to users.
 var reactions = {
@@ -50,11 +55,6 @@ var responses = {
         else if(chance === 4) m.reply('Yare, yaradaze...');
     }
 }
-
-var commandConfig = require('./corePieces/commands.js');
-
-var commands = commandConfig.commands,
-    cooldown = require('./corePieces/cooldown.js');
 
 //This holds every group the bot has touched while it's been turned on. Used to cooldown commands.
 const cooldownGroup = new cooldown.guildGroup();
@@ -102,7 +102,6 @@ for(var i in adminCommands.commands)
 /*Private configuration - you can use lemonbot as a base for some of your own projects.
 Just edit this file and your own things will be included in the bot. This is convenient for something like heroku deployment
 where you can just pull in the lastest changes from the community without much hastle*/
-
 var privateCore = require('./privateCore');
 var privateConfig = privateCore.resultObject;
 
@@ -138,8 +137,16 @@ for(var i of process.argv){
         else console.warn('Could not find the config matching:"'+key+'". Gonna default to the last symbol defined ('+commandSymbol+')');
     }
 }
-
 //End Private config
+
+//Statefull commands, these are configured within sateCommandInterface and are not like regular commands. However they are treated as such for backward compatibility
+for(var i in sci.commands){
+    commands[i] = sci.commands[i];
+}
+
+//We need two items - inserting the client for @mentions to work, and and the command symbol
+sci.setClient(client);
+sci.setCommandSymbol(commandSymbol);
 
 client.on('ready',()=>console.log('Im in! ',client.user.tag));
 
@@ -190,6 +197,7 @@ client.on('message',msg=>{
                 Otherwise if this is a normal command it should run:*/
                 if((adminCommand && runAdminCommand) || !adminCommand){
                     // console.log(msg);
+                    //ACTUALLY RUN THE COMMAND... this is really burried in allot of fluff isn't it? >_<
                     var commandResults = commands[actualCommand](msg,args,actualCommand);
     
                     //Change the cooldown time of said command for that user
