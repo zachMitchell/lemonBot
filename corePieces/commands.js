@@ -31,6 +31,7 @@ var helpDescriptions = [
     ["dumbot", "Ask an intelligent question"],
     ["e", "b[e] r[e]sponsibl[e] with this on[e]"],
     ["math", "Do Stonks"],
+    ["mock","End all your debates instantly with the power of mocking spongebob!"],
     ["rnd", "Ask for a random number"],
     ["rylan", "Display this man's greatness to the channel"],
     ["shuf", "Randomize a list of things"],
