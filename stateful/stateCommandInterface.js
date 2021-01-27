@@ -3,19 +3,20 @@
 //Cleanups every 5 minutes also happen as well.
 const stateManager = require('./stateManager'),
     mentionTools = require('../corePieces/mentionTools'),
-    fileCore = require('./fileCore');
-
-//Every state regardless of guild
-const activeStates = {},
+    fileCore = require('./fileCore'),
+    //Every state regardless of guild
+    activeStates = {},
     guildList = {},
     commonVars = {
-        userNotStart:'Sorry, this user hasn\'t started an activity :/',
         cantJoin:'Sorry, the command blocked you from joining. Reason: ',
         cantLeave:'Sorry, the command blocked you from leaving. Reason: ',
+        stateNotFound: ["Sorry, I couldn't find anything for you to join :/","\nTry again with different information or start something new!"],
         client:undefined,
         symbol:undefined //The symbol for the target command
     }
 
+//Wow I literally have no comments in this function... LET'S FIX THAT
+//What it says on the tin, find a state with all information provided. If a password is provided, it gives us more context and is more clear than just a username
 function findState(m,pass,cmd,userId){
     
     if(!userId) userId = m.author.id;
@@ -24,27 +25,30 @@ function findState(m,pass,cmd,userId){
     var targetUser = findUser(m,userId);
     if(!pass && targetUser){
         if(targetUser.activeCommands[cmd]){
+            //A user and command together can help bring a specific context.
             var ctx = targetUser.activeCommands[cmd].currContext;
             if(!ctx)
-                m.reply('This user isn\'t running '+commonVars.symbol+cmd+'!')
+                return { notFoundReason: 'This user isn\'t running '+commonVars.symbol+cmd+'!' }
             else return { state:ctx, foundByPass:false };
         }
         else if(targetUser.currContext)
             return { state:targetUser.currContext, foundByPass:false };
-        else m.reply(commonVars.userNotStart);
+        else return { notFoundReason: 'This user hasn\'t started an activity :/' };
     }
     else if(pass){
+        //Very direct method of finding the state. If we have a target user, check that first, but otherwise go into this file's activeStates object.
         if(targetUser && cmd && targetUser.activeCommands[cmd]){
             var targetState = targetUser.activeCommands[cmd].states[pass];
             if(!targetState)
-                m.reply('The user you mentioned isn\'t hosting the specified passcode for '+commonVars.symbol+cmd+'!');
+                return { notFoundReason: 'User mentioned isn\'t hosting the specified passcode for '+commonVars.symbol+cmd+'!' }
             else return { state:targetState, foundByPass:true }
         }
+        //Not sure when this would actually hit since passcodes are checked before hitting this function. It's here anyway.
         else if(!activeStates[pass])
-            m.reply('Invalid code!')
+            return { notFoundReason: 'Invalid code!'}
         else return { state: activeStates[pass], foundByPass:true };
     }
-    else m.reply("Sorry, I couldn't find anything for you to join :/ \nTry again with different information or start something new!");
+    else return { notFoundReason: 'Session could not be found with the given context' }
 }
 
 //hot garbage function for finding users in a guild
@@ -56,6 +60,27 @@ function findUser(m,userId){
     else return guild.users[userId];
 }
 
+/*Do stuff before interacting with the command; AKA: preStateExecution
+If for example the target state is expired, we purge it out of existence*/
+function interactWithCommand(state,m,args){
+    if(state.expires != -1 && m.createdTimestamp - (state.expires * 1000) > state.timestamp){
+        //End the sesion and clean up:
+        state.onEnd(state.stateData,m,'sessionExpired');
+        purgeState(state);
+        return;
+    }
+
+    //Ignite the command!
+    var targetUser = state.members[m.author.id];
+    state.timestamp = m.createdTimestamp;
+    var returnObj = state.onFind(state.stateData,targetUser,m,args);
+
+    //If the command wants to anything else (specifically purging itself for now), do the thing
+    if(returnObj && returnObj.endAll)
+        purgeState(state);
+
+}
+
 /*This is designed for any stateful command, plus the @mention listener and /join.
 The purpose of this is to find all the information needed for findState() but all information is gathered through the message object and the items within the string.
 Returns an array, the first being the state, and the second: filtered arguments without mentions*/
@@ -65,13 +90,12 @@ function findStateByContextClues(m,cmd){
 
     //This is somewhat of a monolithic function, so we first need to figure out what the user is trying to say based on context clues
 
-    //Find the first quote in the string in order to test for a passcode.
+    //Find the first item in the string in order to test for a passcode.
     var potentialPass = args[0],
     //Also look for mentions, specifically the ID's of every user besides lemonbot. The first user is our target here in order to join a state
         firstMention = [...m.mentions.users.keys()].filter(e=>e == commonVars.client.user.id?undefined:e)[0];
 
     //We should at least check if the first parameter is a valid passcode. If not, make it undefined so as not to confuse findState()
-    console.log(activeStates,guildList,!activeStates[potentialPass]);
     if(!activeStates[potentialPass])
         potentialPass = undefined;
     
@@ -79,12 +103,10 @@ function findStateByContextClues(m,cmd){
     var resultState = findState(m,potentialPass,cmd,firstMention);
 
     //Remove the beginning where the password was found
-    if(resultState && resultState.foundByPass){
-        console.log('heyyyyy');
+    if(resultState && resultState.state && resultState.foundByPass)
         args = args.slice(1);
-    }
 
-    return [resultState?resultState.state:undefined,args];
+    return [resultState.state,args,resultState.notFoundReason];
 }
 
 //Joins a state. If it's not possible to join, the command from that state will tell the reason behind it.
@@ -98,32 +120,39 @@ function joinState(m,state,args){
     var joinCheck = state.joinCheck(state.stateData,m);
     if(joinCheck.joinable){
         guildList[m.channel.guild.id].joinSession(m.author.id,state);
-        state.onFind(state.stateData,state.members[m.author.id],m,args);
+        interactWithCommand(state,m,args);
     }
     else m.reply(commonVars.cantJoin+joinCheck.reason);
 }
 
 //Copied-pasted joinState to make an opposite function. leaveState is also capable of dismantling a state and removing it across everyone's radar.
-function leaveState(m,state,args){
+function leaveState(m,state){
     //Hello dear stranger! Let's see if you can come in...
     if(!state.members[m.author.id]){
         m.reply(commonVars.cantLeave+"You aren't in the session!");
         return;
     }
 
-    var joinCheck = state.leaveCheck(state.stateData,m);
+    var leaveCheck = state.leaveCheck(state.stateData,m);
     //Delete state here doesn't mean it's remove for everyone, just for the individual who called it.
     //To end it for everyone, the leaveCheck value above must have "endAll" == true.
-    if(joinCheck.leavable && !joinCheck.endAll)
-        guildList[m.channel.guild.id].deleteState(state);
-    else if(joinCheck.endAll){
-
+    if(leaveCheck.leavable && !leaveCheck.endAll)
+    state.members[m.author.id].deleteState(state);
+    else if(leaveCheck.endAll){
+        purgeState(state);
     }
-    else m.reply(commonVars.cantLeave+joinCheck.reason);
+    else m.reply(commonVars.cantLeave+leaveCheck.reason);
 }
 
-function purgeState(){
-    
+//Create a black hole and remove everything about this state object
+function purgeState(targetState){
+    //As far as I know these steps can be done in any order
+
+    //Remove from active states
+    delete activeStates[targetState.pass];
+    //Every member needs this de-referenced and a new context in it's place
+    for(var i in targetState.members)
+        targetState.members[i].deleteState(targetState);
 }
 
 /* Does the following:
@@ -132,17 +161,16 @@ If the member has already joined the state, switch contexts and perform the next
 Otherwise, join the state
 This is here because more than one function does the same thing.*/
 function handleStateContext(m,cmd){
-    var [targetState, args] = findStateByContextClues(m,cmd);
-    if(!targetState) return false;
+    var [targetState, args, notFoundReason] = findStateByContextClues(m,cmd);
+    if(notFoundReason) return notFoundReason;
 
     //We have a state now! It's time to understand what we wanna do with this
     if(targetState.members[m.author.id]){
         //Switch context
         var targetUser = targetState.members[m.author.id];
-        var targetCommand = targetUser.activeCommands[targetState.cmd];
         stateManager.setStateContext(targetState,targetUser,targetState);
         //onFind will allow us to record what's happening to the base of whatever command we're sending this to
-        targetState.onFind(targetState.stateData,targetState.members[m.author.id],m,args);
+        interactWithCommand(targetState,m,args);
     }
     else joinState(m,targetState,args);
 
@@ -154,9 +182,13 @@ var mentionListener = m=>{
     if(!m.mentions.users.get(commonVars.client.user.id) || !m.content.length || m.content.indexOf(commonVars.symbol) === 0) return;
     //Somebody mentioned lemonbot, Let's continue
     //Array Destructuring: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
-    handleStateContext(m);
+    var errStr = handleStateContext(m);
+    if(typeof errStr == 'string') m.reply(commonVars.stateNotFound[0]+(errStr.length?'\nReason: '+errStr:'')+commonVars.stateNotFound[1]);
 }
 
+/*Wow this was ambiguous :P
+Filter out any known commands from the arguments, while also removing the word "create"
+Ok should be less ambiguous bye*/
 function filterCommandAndCreate(args){
     var sliceIndex = 0;
     var argSize = args.length >=2 ? 2 : 1;
@@ -204,10 +236,12 @@ function createState(m,configObj){
     var currGuild = guildList[m.guild.id];
     if(!currGuild)
         currGuild = guildList[m.guild.id] = new stateManager.passBase();
+    var state = currGuild.createSession(m.author.id,configObj.cmd,newPass,m.createdTimestamp,configObj.expires);
 
-    var state = currGuild.createSession(m.author.id,configObj.cmd,newPass,m.createdTimeStamp,configObj.expires);
-    state.onFind = configObj.onFind;
-    state.joinCheck = configObj.joinCheck;
+    //Listener check - go through every possible listener and add it to the state accordingly:
+    for(var i of ['onFind','joinCheck','leaveCheck','onEnd'])
+        if(configObj[i]) state[i] = configObj[i];
+
     //Assign the state to the active states object
     activeStates[newPass] = state;
 
@@ -216,17 +250,24 @@ function createState(m,configObj){
     var argsArray = filterCommandAndCreate(m.content.split(' '));
 
     //The host has created a state, time for them to join!
-    state.onFind(state.stateData,state.members[m.author.id],m,argsArray);
+    interactWithCommand(state,m,argsArray);
 }
 
-//This will be filled up based on a separate file in order to keep things clean. The only one vital is /join which will be defined here
+//This will be filled up based on a separate file in order to keep things clean. The only two vital are /join and /leave which will be defined here
 var commands = {
     /*Primary purpose is to attempt a join regardless if the member joined already.
     It's a design choice to give assesrtion to the user they have joined a state.
     "/join" is filtered out in findStateByContextClues*/
     'join':m=>{
-        var [targetState, args] = findStateByContextClues(m);
-        if(targetState) joinState(m,targetState,args);
+        var [targetState, args, notFoundReason] = findStateByContextClues(m);
+        if(typeof notFoundReason == 'string') m.reply(commonVars.stateNotFound[0]+(notFoundReason.length?'\nReason: ' + notFoundReason:'' )+commonVars.stateNotFound[1]);
+        else joinState(m,targetState,args);
+    },
+    //Like the respective function, it's copy paste of the join command :P
+    'leave':m=>{
+        var [targetState, args, notFoundReason] = findStateByContextClues(m);
+        if(typeof notFoundReason == 'string') m.reply("Hmm... I couldn't find a session for you;\nReason: "+notFoundReason+"\nTry to describe one that you are already in!");
+        else leaveState(m,targetState,args);
     }
 }
 
@@ -240,15 +281,25 @@ function commandIgnite(m,args,actualCommand){
     var filteredArgs = args.slice(1); //removes the beginning the command
 
     //Create a new state if: 1.the word create is present at the beginning, or 2. we fail to find a state based on other context in the message.
-    if(filteredArgs[0] == 'create' || !handleStateContext(m,actualCommand))
+    if(filteredArgs[0] == 'create' || typeof handleStateContext(m,actualCommand) == 'string')
         createState(m,fileCore[actualCommand]);
-
-    console.log(guildList);
 }
 
 //Time to fill up the commands object! It will be commandIgnite for everything, because the command is distinguished via the actualCommand argument
 for(var i in fileCore)
     commands[i] = commandIgnite;
+
+//This interval will do a constant sweep and check if items are expiring or not.
+//Not sure if it's the best idea, but it's mostly to prevent holding thousands of timeouts and resetting them.
+setInterval(()=>{
+    var sweepTimestamp = new Date().valueOf();
+    for( var i in activeStates ){
+        if(sweepTimestamp - (activeStates[i].expires*1000) > activeStates[i].timestamp ){
+            activeStates[i].onEnd(activeStates[i].stateData,undefined,'sessionExpired');
+            purgeState(activeStates[i]);
+        }
+    }
+}, 10*1000*60);
 
 module.exports = {
     setClient:e=>{

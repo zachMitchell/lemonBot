@@ -42,7 +42,8 @@ user.prototype.deleteState = function(targetState){
         delete this.activeCommands[targetState.cmd].currContext;
     
     delete this.activeCommands[targetState.cmd].states[targetState.pass];
-    delete this.passcodes[targetState.cmd];
+    delete this.passcodes[targetState.pass];
+    delete targetState.members[this.userId];
 
     //Reset context
     this.switchToLastContext();
@@ -55,7 +56,7 @@ function commandCtx(){
 
 //States are basically clean slates to do whatever with. The only rule behind it is to keep the source of other cotexts readily available for a state sweep
 //These assume the origin is an object with a passcode
-function state(cmd = '', pass = '', members = [],timestamp = 0, expires = -1){
+function state(cmd = '', pass = '', members = [], timestamp = 0, expires = -1){
     this.cmd = cmd;
     this.pass = pass;
     this.members = {};
@@ -66,6 +67,7 @@ function state(cmd = '', pass = '', members = [],timestamp = 0, expires = -1){
     this.stateData = { rootInfo: this };
     //Function that can be used to conduct a states usage. In other words, it's a way to expose the series of functions and execute things accordingly
     this.onFind = (stateData,member,msg,args)=>{};
+    this.onEnd = (stateData,m)=>{};
     this.joinCheck = (stateData,msg)=>true;
     this.leaveCheck = (stateData,msg)=>true;
 
@@ -100,7 +102,7 @@ passBase.prototype.joinSession = function(userId=0,state){
     var targetCommand = targetUser.activeCommands[state.cmd] || (targetUser.activeCommands[state.cmd] = new commandCtx());
     setNewStateContext(targetCommand,targetUser,state,state.pass);
     //Add user to state
-    state[userId] = targetUser;
+    state.members[userId] = targetUser;
 
     return state;
 }
