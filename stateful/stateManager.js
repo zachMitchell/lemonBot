@@ -44,6 +44,10 @@ user.prototype.deleteState = function(targetState){
     delete this.activeCommands[targetState.cmd].states[targetState.pass];
     delete this.passcodes[targetState.pass];
     delete targetState.members[this.userId];
+    
+    //If this user is the host... well rip
+    if(targetState.host == this)
+        delete targetState.host;
 
     //Reset context
     this.switchToLastContext();

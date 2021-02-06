@@ -137,7 +137,7 @@ function leaveState(m,state){
     //Delete state here doesn't mean it's remove for everyone, just for the individual who called it.
     //To end it for everyone, the leaveCheck value above must have "endAll" == true.
     if(leaveCheck.leavable && !leaveCheck.endAll)
-    state.members[m.author.id].deleteState(state);
+        state.members[m.author.id].deleteState(state);
     else if(leaveCheck.endAll){
         purgeState(state);
     }
@@ -179,7 +179,7 @@ function handleStateContext(m,cmd){
 
 //This will probably be a big fella once it's done. It's purpose is to filter out context in order to figure out what to do with user context
 var mentionListener = m=>{
-    if(!m.mentions.users.get(commonVars.client.user.id) || !m.content.length || m.content.indexOf(commonVars.symbol) === 0) return;
+    if(m.author.id == commonVars.client.user.id || !m.mentions.users.get(commonVars.client.user.id) || !m.content.length || m.content.indexOf(commonVars.symbol) === 0) return;
     //Somebody mentioned lemonbot, Let's continue
     //Array Destructuring: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
     var errStr = handleStateContext(m);
