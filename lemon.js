@@ -73,8 +73,9 @@ var cooldownDefaults = {
         uses:1,
         commands:['age','dumbot','wisdom']
     },
-    'help':{coolTime:180,uses:1},
-    'math': { coolTime:25, uses: 5},
+    'math': { coolTime:25, uses:5 },
+    'mock': { coolTime:15, uses:1 },
+    'help':{coolTime:180,uses:1 },
     'rnd':{ coolTime:3, uses:2 },
     'rylan':{ coolTime:30, uses:2 },
     'shuf':{ coolTime:15, uses:1 },
