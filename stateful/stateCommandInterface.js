@@ -299,7 +299,7 @@ setInterval(()=>{
             purgeState(activeStates[i]);
         }
     }
-}, 10*1000*60);
+}, 5*1000*60);
 
 module.exports = {
     setClient:e=>{
