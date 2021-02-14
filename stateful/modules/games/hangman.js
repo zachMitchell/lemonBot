@@ -1,6 +1,6 @@
 //Made by Zachary Mitchell in 2021!
 //A long time ago there used to be this flash hangman game called "hangman.no". It's gone now, but discord is a new canvas, so this could probably last longer.
-const {quoteParser, regxpFriendlyFilter} = require('../../../corePieces/mentionTools'),
+const {quoteParser} = require('../../../corePieces/mentionTools'),
     dimIndexer = require('../../../lemonModules/multiDimIndexer'),
     hangmanWords = require('./hangmanWords.json'),
     messages = {
