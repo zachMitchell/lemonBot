@@ -74,7 +74,7 @@ function channelParser(str){
 }
 
 //More advanced arguments were added in the event there are regex sensitive symbols. syntax would replace ", while splitter is an extra command that would tell what we need to split instead of the regex itself.
-var quoteParser = (str, syntax = '"',splitter)=> [...str.matchAll(new RegExp(syntax+'[A-Za-z0-9\ ]*'+syntax,'g'))].map(e=>e[0].split(splitter || syntax)[1]);
+var quoteParser = (str, syntax = '"',splitter)=> [...str.matchAll(new RegExp(syntax+'[^\\'+syntax+']*'+syntax,'g'))].map(e=>e[0].split(splitter || syntax)[1]);
 
 function clearMentions(str){
     var mentionTypes = ['<@','<@!','<@&'];
