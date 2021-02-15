@@ -17,7 +17,11 @@ var quotes = [
     "I'm done. I'm so done. I'm done. Bye. *[leaves call]*",
     "You're only good cause ur bad",
     'Have you tried getting good?',
-    'lol you bad *[Falls into the Minecraft void]*'
+    'lol you bad *[Falls into the Minecraft void]*',
+    'I am war',
+    'I need to die real quick, let me spawn in a train',
+    "It's the embodiment of **chaos**",
+    '',
 ]
 
 var rylansWisdom = ()=>quotes[Math.floor(Math.random()*quotes.length)];

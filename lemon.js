@@ -18,6 +18,12 @@ var commands = commandConfig.commands,
 
 //Reactions are the way lemonbot responds back whether that be an emoji or a message to users.
 var reactions = {
+    bigDumb:[
+        'brain',
+        'woozy',
+        'zombieF',
+        'zombieM'
+    ],
     hi: [
         'Howdy!',
         'hiIneedattention',
@@ -26,17 +32,24 @@ var reactions = {
         'Hello!',
         'salutations and the most epic of greetings to you as well.'
     ],
+    jojoReference:[
+        'expressionless',
+        'eyeroll',
+        'lying',
+        'flushed'
+    ],
     pog: [
         'cool',
         'mecharm',
         'moneyface',
         'starstruck'
     ],
-    jojoReference:[
-        'expressionless',
-        'eyeroll',
-        'lying',
-        'flushed'
+    sadness:[
+        'bigCry',
+        'confounded',
+        'cry',
+        'frown',
+        'scrunched'
     ]
 }
 
@@ -53,7 +66,9 @@ var responses = {
             m.react(emoji[reactions.jojoReference[selectedReaction]]);
         }
         else if(chance === 4) m.reply('Yare, yaradaze...');
-    }
+    },
+    'big dumb': m=>rndAction(5,e=>m.react(emoji[e]),reactions.bigDumb),
+    'sadness': m=>rndAction(5,e=>m.react(emoji[e]),reactions.sadness)
 }
 
 //This holds every group the bot has touched while it's been turned on. Used to cooldown commands.
