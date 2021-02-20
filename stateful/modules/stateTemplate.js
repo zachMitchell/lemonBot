@@ -1,5 +1,5 @@
 //Stripped-down template for statefull commands based on stateTest.js
-function joinCheck(stateData){}
+function joinCheck(stateData,m){}
 
 function leaveCheck(stateData,m){}
 

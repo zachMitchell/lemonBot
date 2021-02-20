@@ -10,6 +10,7 @@ const {quoteParser} = require('../../../corePieces/mentionTools'),
     newWord: 'Placed in a new word/phrase... good luck!',
     spaceToStar:'By the way, spaces are shown as stars (*)',
     alreadyTried:'that was already used!',
+    noValidCharacters:'You need at least one letter or number in your word!',
     hostGuess:'You made the word, so you can\'t guess this one!',
     correctWord:' guessed the rest of the word!',
     hostEnd:'[The host has left the game]',
@@ -55,7 +56,7 @@ const {quoteParser} = require('../../../corePieces/mentionTools'),
     //Hats, heads, shirts, pants and shoes to draw a hangman.
     hangmanEmoji = [
     ['🎩','🧢','🪖','🕶️','🥽','👑'],
-    ['😒','😑','🤯','🥸','🤦‍♂️','😵‍💫','😵'],
+    ['😒','😑','🤯','🥸','😵‍💫','😵'],
     ['🧥','👔','👕','🥼'],
     ['🩳','👖'],
     ['🧦','👞','👟','🥾']
@@ -96,6 +97,7 @@ const {quoteParser} = require('../../../corePieces/mentionTools'),
     }
 }
 
+//Like it says in the object's file, this will convert an object that has a multi-dimension object/array and treats everything like a single-dimension array.
 var wordIndexer = new dimIndexer(hangmanWords);
 
 //In the event we need to draw a new message to play the game, just create a new message.
@@ -277,7 +279,8 @@ function onFind(stateData, member, msg, args){
             var phrase = quoteParser(msg.content,'\\|\\|','||')[0],
                 hint = quoteParser(msg.content)[0];
             if(phrase){
-                if(phrase.length < 50){
+                if(!/[A-Za-z0-9]/.test(phrase)) logPush(stateData.log,msg.author.username+': '+messages.noValidCharacters);
+                else if(phrase.length < 50){
                     stateData.game = new game(phrase,hint,true);
                     stateData.gameStarted = true;
                     logPush(stateData.log,msg.author.username+': '+messages.newWord + " " + messages.spaceToStar);

@@ -6,7 +6,7 @@ In this case I'm using a hint of both.*/
 var fileList = [];
 var moduleResults = {};
 
-fileList.push('./modules/stateTest','./modules/games/tictactoe','./modules/games/hangman');
+fileList.push('./modules/stateTest','./modules/games/tictactoe','./modules/games/hangman','./modules/games/mastermind');
 
 //import all listed modules
 for(var i of fileList){
