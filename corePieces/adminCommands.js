@@ -2,14 +2,14 @@
 //Holy cow admin tools are getting huge; guess it's time for a dedicated file!
 
 var adminTools = require('./adminTools'),
-    mentionTools = require('../lemonModules/mentionTools'),
+    mentionTools = require('./mentionTools'),
     shuffle = require('../lemonModules/shuffle'),
     timeTools = require('../lemonModules/timeTools'),
     adminHelpDesc = [
         ['del','Remove messages from the channel you called this command from'],
         ['move','Takes messages out of this channel and puts them in another of your choice'],
         ['mute','Mutes entire voice channels (or groups of), if you add a number it will stay muted for that number in minutes'],
-        ['umute','Un-mutes an entire channel'],
+        ['unmute','Un-mutes an entire channel'],
         ['voisplit','Put everyone randomly (but evenly) into different voice channels'],
         ['raid','Move an entire voice channel into another channel']
     ],
@@ -227,7 +227,7 @@ var commands = {
             voiceStates[targetChannel.id][0] = universalTimeout;
         }
     },
-    'umute':m=>{
+    'unmute':m=>{
         /*This command is special, it can either take a message object or an array of channel objects
         It wouldn't make sense to check for admin upon accepting channel objects so this is avoided*/
         //m can be two things, a message or a channel depending on how it was invoked.

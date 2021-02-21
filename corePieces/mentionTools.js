@@ -73,11 +73,23 @@ function channelParser(str){
     return results;
 }
 
-var quoteParser = str=> [...str.matchAll(/"[A-Za-z0-9\ ]*"/g)].map(e=>e[0].split('"')[1]);
+//More advanced arguments were added in the event there are regex sensitive symbols. syntax would replace ", while splitter is an extra command that would tell what we need to split instead of the regex itself.
+var quoteParser = (str, syntax = '"',splitter)=> [...str.matchAll(new RegExp(syntax+'[^\\'+syntax+']*'+syntax,'g'))].map(e=>e[0].split(splitter || syntax)[1]);
+
+function clearMentions(str){
+    var mentionTypes = ['<@','<@!','<@&'];
+    return str.split(' ').filter(e=>{
+        for(var i of mentionTypes)
+            if(e.indexOf(i) > -1) return '';
+                
+        return e;
+    }).join(' ');
+};
 
 if(typeof module == 'object' && typeof module.exports == 'object')
     module.exports = { 
         replaceMentionTags:replaceMentionTags, 
         channelParser:channelParser,
-        quoteParser:quoteParser
+        quoteParser:quoteParser,
+        clearMentions:clearMentions
     };

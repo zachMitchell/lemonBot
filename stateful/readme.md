@@ -19,7 +19,3 @@ In general, this is very much a feature of it's own class in that it was designe
 * stateManager.js - object definitions and methods to swap contexts and allow others to join/leave states
 * stateCommandInterface.js - contains things to setup lemonbot for taking in contexts
 * games - Games broken down into small functions that use state system
-
-## Extra note
-
-You don't need to add your command here in order to test it. If you have a command purely for debugging and you want to save it for later, private configs are compatible with this format, so that way you don't need to make extra branches or .gitignore files.

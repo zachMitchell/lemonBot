@@ -33,9 +33,9 @@ function guild (id=''){
     bool - true or false depending on if the user tried the command again
     number - time in seconds for the command to open up again. Undefined if cooldown is not active.
 ]
+    the checkOnly parameter will not cause the use-counter to go down, but will instead just inspect what's already there.
  */
-guild.prototype.updateUsage = function(cmd,message){
-
+guild.prototype.updateUsage = function(cmd,message,checkOnly = false){
     var targetCommand = this.commands[cmd],
         userId = message.author.id,
         timeStamp = message.createdTimestamp,
@@ -49,21 +49,25 @@ guild.prototype.updateUsage = function(cmd,message){
 
     if(targetCommand.uses === 0 && coolTime == -1){
         var triedAgainOg = commandUser.triedAgain;
-        commandUser.triedAgain = true;
+        if(!checkOnly) commandUser.triedAgain = true;
         return [null,triedAgainOg];
     }
     
     else if(commandUser.usesLeft > 0){
-        commandUser.usesLeft--;
-        commandUser.timeStamp = timeStamp;
+        if(!checkOnly){
+            commandUser.usesLeft--;
+            commandUser.timeStamp = timeStamp;
+        }
         
         return [false,false];
     }
     else if((timeStamp - commandUser.timeStamp) / 1000 > targetCommand.coolTime ){
         // console.log((timeStamp - commandUser.timeStamp),timeStamp,commandUser.timeStamp);
-        commandUser.usesLeft = targetCommand.uses -1;
-        commandUser.timeStamp = timeStamp;
-        commandUser.triedAgain = false;
+        if(!checkOnly){
+            commandUser.usesLeft = targetCommand.uses -1;
+            commandUser.timeStamp = timeStamp;
+            commandUser.triedAgain = false;
+        }
 
         return [false,false];
     }

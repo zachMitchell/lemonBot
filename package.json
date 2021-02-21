@@ -1,11 +1,14 @@
 {
     "name": "lemon-bot",
-    "version": "1.8.1",
+    "version": "2.0.0",
     "main": "lemon.js",
     "scripts": {
         "start": "node lemon.js"
     },
     "dependencies": {
         "discord.js": "^12.3.1"
+    },
+    "engines": {
+        "node": "15.9.0"
     }
 }

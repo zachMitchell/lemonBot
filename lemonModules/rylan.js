@@ -14,7 +14,8 @@ var rylanList = [
     'https://i.imgur.com/w5rcwqT.png',
     'https://i.imgur.com/Y5AT5Tg.png',
     'https://i.imgur.com/AtyftZP.png',
-    'https://i.imgur.com/zIGqSXe.png'
+    'https://i.imgur.com/zIGqSXe.png',
+    'https://i.imgur.com/HvEcGTN.png'
 ];
 
 var rylan = ()=>rylanList[Math.floor(Math.random()*rylanList.length)];

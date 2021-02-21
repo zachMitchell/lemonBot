@@ -42,7 +42,12 @@ user.prototype.deleteState = function(targetState){
         delete this.activeCommands[targetState.cmd].currContext;
     
     delete this.activeCommands[targetState.cmd].states[targetState.pass];
-    delete this.passcodes[targetState.cmd];
+    delete this.passcodes[targetState.pass];
+    delete targetState.members[this.userId];
+    
+    //If this user is the host... well rip
+    if(targetState.host == this)
+        delete targetState.host;
 
     //Reset context
     this.switchToLastContext();
@@ -55,7 +60,7 @@ function commandCtx(){
 
 //States are basically clean slates to do whatever with. The only rule behind it is to keep the source of other cotexts readily available for a state sweep
 //These assume the origin is an object with a passcode
-function state(cmd = '', pass = '', members = [],timestamp = 0, expires = -1){
+function state(cmd = '', pass = '', members = [], timestamp = 0, expires = -1){
     this.cmd = cmd;
     this.pass = pass;
     this.members = {};
@@ -63,10 +68,12 @@ function state(cmd = '', pass = '', members = [],timestamp = 0, expires = -1){
     this.timestamp = timestamp; //Updated everytime an action happens
     this.expires = expires; //Time in seconds. If -1 it's unlimited
     //Creates a dedicated space to hold outside variables and not step on variable names here
-    this.stateData = {};
+    this.stateData = { rootInfo: this };
     //Function that can be used to conduct a states usage. In other words, it's a way to expose the series of functions and execute things accordingly
-    this.onFind;
-    this.joinCheck;
+    this.onFind = (stateData,member,msg,args)=>{};
+    this.onEnd = (stateData,m)=>{};
+    this.joinCheck = (stateData,msg)=>true;
+    this.leaveCheck = (stateData,msg)=>true;
 
     for(var i of members)
         this.members[i.userId] = i;
@@ -99,7 +106,7 @@ passBase.prototype.joinSession = function(userId=0,state){
     var targetCommand = targetUser.activeCommands[state.cmd] || (targetUser.activeCommands[state.cmd] = new commandCtx());
     setNewStateContext(targetCommand,targetUser,state,state.pass);
     //Add user to state
-    state[userId] = targetUser;
+    state.members[userId] = targetUser;
 
     return state;
 }
@@ -117,5 +124,6 @@ passBase.prototype.joinSessionByClues = function(hostId=0,joiningId=0,pass=''){
 if(typeof module == 'object' && module.exports)
     module.exports = {
         passBase:passBase,
-        passcode:passcode   
+        passcode:passcode,
+        setStateContext:setStateContext,
     }
