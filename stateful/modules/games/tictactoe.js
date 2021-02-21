@@ -247,6 +247,8 @@ function onFind(stateData, member, msg, args){
         drawGame(stateData.game,stateData.log,stateData,true);
 
         stateData.initialSetup = 1;
+        
+        msg.delete();
     }
     else{
         //Progress the game by figuring out what the user wants to do.
@@ -331,9 +333,8 @@ function onFind(stateData, member, msg, args){
             msg.delete();
             return {cooldownHit:cooldown};
         }
+        msg.delete();
     }
-
-    msg.delete();
 }
 
 function onEnd(stateData,m,reason){
