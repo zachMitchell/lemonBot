@@ -16,7 +16,7 @@ const {quoteParser} = require('../../../corePieces/mentionTools'),
     hostEnd:'[The host has left the game]',
     sessionExpired:'[Rats... the session expired]',
     gameOver:'Game over, this session will now end',
-    wordErr:'Words or phrases must be less than 50 characters',
+    wordErr:'Words or phrases must be less than 100 characters',
     maxGuesses:'The hangman was hung...',
     incorrectRnd:[
         " - which wasn't correct",
@@ -280,7 +280,7 @@ function onFind(stateData, member, msg, args){
                 hint = quoteParser(msg.content)[0];
             if(phrase){
                 if(!/[A-Za-z0-9]/.test(phrase)) logPush(stateData.log,msg.author.username+': '+messages.noValidCharacters);
-                else if(phrase.length < 50){
+                else if(phrase.length < 100){
                     stateData.game = new game(phrase,hint,true);
                     stateData.gameStarted = true;
                     logPush(stateData.log,msg.author.username+': '+messages.newWord + " " + messages.spaceToStar);
@@ -316,7 +316,7 @@ function onFind(stateData, member, msg, args){
 }
 
 function onEnd(stateData,m,reason){
-    if(stateData.gameStarted){
+    if(stateData.gameMsg){
         if(reason == 'sessionExpired') logPush(stateData.log,messages.sessionExpired);
         logPush(stateData.log,messages.gameOver);
         //convert the array to a correct answer:
