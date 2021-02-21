@@ -136,12 +136,12 @@ function gameFlow(stateData,args){
         //Guess the word
         if(targetString.length > 50){
             logPush(stateData.log,username+': '+messages.wordErr);
-            return;
+            return {cooldownHit:true};
         }
         switch(stateData.game.guess(targetString.replaceAll(' ','*'))){
             case 'alreadyGuessed':
                 logPush(stateData.log,username+': '+messages.alreadyTried+' ('+targetString+')');
-            break;
+            return {cooldownHit:true};
             case false:
                 logPush(stateData.log,username + ' guessed: "'+targetString+'"'+messages.incorrectRnd[Math.floor(Math.random()* messages.incorrectRnd.length)]);
                 if(stateData.game.wrongStrike()){
@@ -258,10 +258,10 @@ function onFind(stateData, member, msg, args){
         switch(args[0]){
             case 'help':
                 msg.channel.send(messages.howToPlay);
-                return;
+                return {cooldownHit:true, endAll:!stateData.log};
             case 'redraw':
                 drawGame(stateData.game,stateData,true);
-                return;
+                return {cooldownHit:true};
         }
     }
 
@@ -298,12 +298,15 @@ function onFind(stateData, member, msg, args){
         //stateData.gameMsg is an object, so if it doesn't exist, we will create a new message.
         drawGame(stateData.game,stateData,!stateData.gameMsg);
         stateData.lMsg.delete();
+        return {cooldownHit:true}
     }
     else{
         var stateMsg;
         //Go through the game routine
-        if(msg.author.id == stateData.rootInfo.host.userId && stateData.game.customWord)
+        if(msg.author.id == stateData.rootInfo.host.userId && stateData.game.customWord){
             logPush(stateData.log,msg.author.username+': '+messages.hostGuess);
+            stateMsg = {cooldownHit:true};
+        }
             //Going to move the main game logic to another function. From what I did with tic-tac-toe, it was a nightmare to search around :P
         else stateMsg = gameFlow(stateData,args);
         
@@ -314,18 +317,21 @@ function onFind(stateData, member, msg, args){
 }
 
 function onEnd(stateData,m,reason){
-    if(reason == 'sessionExpired') logPush(stateData.log,messages.sessionExpired);
-    logPush(stateData.log,messages.gameOver);
-    //convert the array to a correct answer:
-    if(stateData.game)
-        stateData.game.wordProgress = stateData.game.word.replaceAll('*',' ').split('');
-    //Reveal the answer then draw the game
-    drawGame(stateData.game,stateData);
+    if(stateData.gameStarted){
+        if(reason == 'sessionExpired') logPush(stateData.log,messages.sessionExpired);
+        logPush(stateData.log,messages.gameOver);
+        //convert the array to a correct answer:
+        if(stateData.game)
+            stateData.game.wordProgress = stateData.game.word.replaceAll('*',' ').split('');
+        //Reveal the answer then draw the game
+        drawGame(stateData.game,stateData);
+    }
+    else console.log("If you're reading this wow you're smart!");
 }
 
 module.exports = {
     cmd:'hangman',
-    helpDesc:'Guess the word! ...or the emoji man **dies**',
+    helpText:'Guess the word! ...or the emoji man **dies**',
     joinCheck:joinCheck,
     onFind:onFind,
     onEnd:onEnd,

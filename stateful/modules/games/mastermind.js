@@ -13,6 +13,7 @@ const shuffle = require('../../../lemonModules/shuffle'),
     gameLose:"Bummer... the code wasn't cracked...",
     crackedCode:"cracked the code!",
     gameOver:"Game over; this session will now end.",
+    sessionExpired:'Dow... looks like this session expired >~<',
     helpPage:`How to play mastermind!
 
     * You are an 1337 hAX0r trying to guess a secret code... either from the computer or a human opponent!
@@ -26,7 +27,7 @@ const shuffle = require('../../../lemonModules/shuffle'),
     
     Setting up & Playing:
     * To ask for a random number, use: \`/mmind rnd\`
-    * If you are the host, surround your code with || to start a game! (you can't guess your own code) (e.g \`/mmind ||1234||\`)
+    * If you are the host, surround your code with \`||\` to start a game! (you can't guess your own code) (e.g \`/mmind ||1234||\`)
     * To guess a code, type your guess down like this: \`/mmind 1234\`
     `
 },
@@ -153,18 +154,19 @@ function leaveCheck(stateData,m){
 
 function onFind(stateData, member, msg, args){
     stateData.lMsg = msg;
+    var usageHit = false;
 
     if(isNaN(args[0])){
         switch(args[0]){
             case "redraw":
                 if(member == stateData.rootInfo.host)
                     drawGame(stateData.progressArray,stateData,true);
-                return;
+                return {cooldownHit:true};
             case "help":
                 msg.channel.send(messages.helpPage);
                 //If the player triggered this without necessarily starting a game, this happens.
                 if(!stateData.gameMsg) onEnd(stateData,msg);
-                return;
+                return {cooldownHit:true};
         }
     }
 
@@ -200,6 +202,7 @@ function onFind(stateData, member, msg, args){
         else if(args && args[0]) logPush(stateData.log,msg.author.username+': '+messages.noHostSetup);
 
         drawGame(undefined,stateData,!stateData.gameMsg);
+        usageHit = true;
     }
     else{
         //Game flow
@@ -207,13 +210,13 @@ function onFind(stateData, member, msg, args){
             if(member == stateData.rootInfo.host && !stateData.rndNumber){
                 logPush(stateData.log, msg.author.username+': '+messages.hostGuess);
                 drawGame(stateData.progressArray,stateData);
-                return;
+                return {cooldownHit:true};
             }
             //Routine check if the number is valid
             else if(!validNumber(args[0])){
                 logPush(stateData.log,messages.onlyNumbers);
                 drawGame(stateData.progressArray,stateData);
-                return;
+                return {cooldownHit:true};
             }
             
             //Go through the game check to see what score the player got. This array will have game data on the first index, and weather the game was won on the second index.
@@ -237,11 +240,12 @@ function onFind(stateData, member, msg, args){
         drawGame(stateData.progressArray,stateData);
     }
     msg.delete();
+    if(usageHit) return {cooldownHit: true}
 }
 
 function onEnd(stateData,m,reason){
     if(stateData.gameMsg){
-        if(reason == 'sessionExpire') logPush(stateData.log,'Dow... looks like this session expired >~<');
+        if(reason == 'sessionExpire') logPush(stateData.log,messages.sessionExpired);
         if(stateData.answer) logPush(stateData.log,"Answer: "+stateData.answer);
         logPush(stateData.log,messages.gameOver);
         drawGame(stateData.progressArray,stateData);
@@ -250,7 +254,7 @@ function onEnd(stateData,m,reason){
 
 module.exports = {
     cmd:'mmind',
-    helpText:'A game of logic to crack the code of your opponent!',
+    helpText:'Mastermind: A game of logic to crack the code of your opponent!',
     joinCheck:joinCheck,
     onFind:onFind,
     onEnd:onEnd,

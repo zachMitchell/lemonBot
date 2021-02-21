@@ -1,4 +1,7 @@
 //Made by Zachary Mitchell in 2021!
+
+const { cool } = require("../../../corePieces/emoji");
+
 //One of the first video games was tictactoe on a mainframe machine. I don't have one of those though, so this will be through discord instead
 var messages = {
     joined:' joined as ',
@@ -227,6 +230,7 @@ function leaveCheck(stateData,m){
 
 function onFind(stateData, member, msg, args){
     stateData.lMsg = msg; //Last message
+    var cooldown = false;
     //If this state is new, create the game structure!
     //initialSetup increments everytime a step in the game setup finishes When it reaches 3: it starts to say who's turn is next. 
     if(!stateData.initialSetup){
@@ -258,16 +262,19 @@ function onFind(stateData, member, msg, args){
                 logPush(stateData.log,msg.author.username+': '+ messages.notYourTurn[notTurnProgress[notGameTurn]]);
                 if(notTurnProgress[notGameTurn] < messages.notYourTurn.length-1)
                     notTurnProgress[notGameTurn]++;
+                else cooldown = true
             }
             //Invalid number
             else if(args[0] < 1 || args[0] > 9){
                 logPush(stateData.log,currPlayer.username+': '+ messages.invalidNumber);
+                cooldown = true;
             }
             else{
                 //Check to see if somebody took that place on the board:
                 var board = stateData.game.board;
                 if(board[args[0] -1]){ //If this is already defined, there's already an entry
                     logPush(stateData.log, messages.takenPlace + ', ' + currPlayer.username);
+                    cooldown = true;
                 }
                 else{
                     //Valid board placement over here, after inserting that onto the board, it's time to check if the player won:
@@ -292,13 +299,14 @@ function onFind(stateData, member, msg, args){
             drawGame(stateData.game,stateData.log,stateData);
 
             msg.delete();
-            return;
+            return {cooldownHit:cooldown};
         }
 
         //Otherwise, process commands here:
         switch(args[0]){
             case 'help':
                 msg.reply(helpText);
+                cooldown = true;
             break;
             case 'end':
                 //End the game early
@@ -311,12 +319,18 @@ function onFind(stateData, member, msg, args){
             break;
             case 'redraw':
                 drawGame(stateData.game,stateData.log,stateData,true);
+                cooldown = true;
         }
 
         //do some work if there's no host or somebody joined:
         if(stateData.newHost){
             stateData.rootInfo.host = stateData.rootInfo.members[msg.author.id];
             stateData.newHost = false;
+        }
+
+        if(cooldown){
+            msg.delete();
+            return {cooldownHit:cooldown};
         }
     }
 

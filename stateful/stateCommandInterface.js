@@ -3,7 +3,7 @@
 //Cleanups every 5 minutes also happen as well.
 const stateManager = require('./stateManager'),
     mentionTools = require('../corePieces/mentionTools'),
-    fileCore = require('./fileCore'),
+    fileCore = require('./fileCore'), //Statefull commands get imported here!
     //Every state regardless of guild
     activeStates = {},
     guildList = {},
@@ -12,8 +12,10 @@ const stateManager = require('./stateManager'),
         cantLeave:'Sorry, the command blocked you from leaving. Reason: ',
         stateNotFound: ["Sorry, I couldn't find anything for you to join :/","\nTry again with different information or start something new!"],
         client:undefined,
-        symbol:undefined //The symbol for the target command
-    }
+        symbol:undefined, //The symbol for the target command
+        cooldownGroup:undefined //Imported from lemon.js in order to prevent command abuse. Stateful commands have allot more moving parts so this is important :P
+    },
+    coolInf = require('../corePieces/cooldownInterface');
 
 //Wow I literally have no comments in this function... LET'S FIX THAT
 //What it says on the tin, find a state with all information provided. If a password is provided, it gives us more context and is more clear than just a username
@@ -37,10 +39,13 @@ function findState(m,pass,cmd,userId){
     }
     else if(pass){
         //Very direct method of finding the state. If we have a target user, check that first, but otherwise go into this file's activeStates object.
-        if(targetUser && cmd && targetUser.activeCommands[cmd]){
+        if(targetUser && cmd){
+            var reason = 'User mentioned isn\'t hosting the specified passcode for '+commonVars.symbol+cmd+'!';
+            if(!targetUser.activeCommands[cmd])
+                return {notFoundReason:reason}
             var targetState = targetUser.activeCommands[cmd].states[pass];
             if(!targetState)
-                return { notFoundReason: 'User mentioned isn\'t hosting the specified passcode for '+commonVars.symbol+cmd+'!' }
+                return { notFoundReason:reason}
             else return { state:targetState, foundByPass:true }
         }
         //Not sure when this would actually hit since passcodes are checked before hitting this function. It's here anyway.
@@ -60,6 +65,10 @@ function findUser(m,userId){
     else return guild.users[userId];
 }
 
+//Because lemon.js is forced to ignite any new command, we don't need to ever create a cooldown group in this file! If you are importing this file to a different bot however, please keep this in mind.
+//m is a discord message.
+var cooldownExists = m=>commonVars.cooldownGroup && commonVars.cooldownGroup[m.guild.id];
+
 /*Do stuff before interacting with the command; AKA: preStateExecution
 If for example the target state is expired, we purge it out of existence*/
 function interactWithCommand(state,m,args){
@@ -70,12 +79,26 @@ function interactWithCommand(state,m,args){
         return;
     }
 
+    //A "checkOnly" argument was added to cooldown functionality just to see the status of the command cooldown without affecting the numbers themselves
+    //As a result it will be run twice, once to view the status here, and another next time in order to update usage.
+    if(cooldownExists(m)){
+        var cooldownInspect = commonVars.cooldownGroup[m.channel.guild.id].updateUsage(state.cmd,m,true);
+        if(cooldownInspect[0]){
+            coolInf.cooldownStrikeErr(cooldownInspect,m);
+            return; //A true boolean over here means we cannot continue running the command.
+        }
+    }
+
     //Ignite the command!
     var targetUser = state.members[m.author.id];
     state.timestamp = m.createdTimestamp;
     var returnObj = state.onFind(state.stateData,targetUser,m,args);
 
-    //If the command wants to anything else (specifically purging itself for now), do the thing
+    //Cooldown! U ain't escaping it m8 >:)
+    if(cooldownExists(m) && returnObj && returnObj.cooldownHit )
+        commonVars.cooldownGroup[m.channel.guild.id].updateUsage(state.cmd,m);
+
+    //If the command wants to do anything else (specifically purging itself for now), do the thing
     if(returnObj && returnObj.endAll)
         purgeState(state);
 
@@ -269,7 +292,16 @@ var commands = {
         if(typeof notFoundReason == 'string') m.reply("Hmm... I couldn't find a session for you;\nReason: "+notFoundReason+"\nTry to describe one that you are already in!");
         else leaveState(m,targetState,args);
     }
-}
+},
+//These will display based on help descriptions of commands from fileCore. Descriptions from /join and /leave will be present too.
+helpDescriptions = [
+    ['join','hop into an existing activity with your friends!'],
+    ['leave',"exit an activity you're in the middle of"]
+]
+
+//Append custom commands to this list.
+for(var i in fileCore)
+    helpDescriptions.push([i,fileCore[i].helpText])
 
 /*Initial setup for the commands object. The dependency for this part is fileCore.js in order to create a consistent foundation.
 For backwards compatibility with commands.js, everything will be addressed as if each item were their own command. The main difference 
@@ -307,5 +339,7 @@ module.exports = {
         e.on('message',mentionListener);
     },
     setCommandSymbol:e=>commonVars.symbol = e,
-    commands:commands
+    setCooldownGroup:e=>commonVars.cooldownGroup = e,
+    commands:commands,
+    helpDescriptions:helpDescriptions
 }
