@@ -217,7 +217,7 @@ client.on('message',msg=>{
             }
 
             //This function tracks the command's use. If we can't use it, don't run the command.
-            var cooldownResults = runAdminCommand? undefined: cooldownGroup[msg.channel.guild.id].updateUsage(actualCommand,msg);
+            var cooldownResults = (!sci.commands[actualCommand] || runAdminCommand) ? undefined: cooldownGroup[msg.channel.guild.id].updateUsage(actualCommand,msg);
             if(adminCommand && cooldownResults && !cooldownResults[0])
                 printPermsErr(msg,permsResults[1]);
             //Run the comand
