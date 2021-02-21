@@ -299,8 +299,6 @@ function onFind(stateData, member, msg, args){
             }
 
             drawGame(stateData.game,stateData.log,stateData);
-
-            msg.delete();
         }
 
         //Otherwise, process commands here:

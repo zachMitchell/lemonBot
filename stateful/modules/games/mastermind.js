@@ -242,7 +242,7 @@ function onFind(stateData, member, msg, args){
 
 function onEnd(stateData,m,reason){
     if(stateData.gameMsg){
-        if(reason == 'sessionExpire') logPush(stateData.log,messages.sessionExpired);
+        if(reason == 'sessionExpired') logPush(stateData.log,messages.sessionExpired);
         if(stateData.answer) logPush(stateData.log,"Answer: "+stateData.answer);
         logPush(stateData.log,messages.gameOver);
         drawGame(stateData.progressArray,stateData);
