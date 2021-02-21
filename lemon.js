@@ -106,8 +106,8 @@ var cooldownDefaults = {
     },
     'statefullGroup':{
         isGroup:true,
-        coolTime: 90,
-        uses:3,
+        coolTime: 45,
+        uses:4,
         commands:['tttoe','hangman','mmind']
     }
 }

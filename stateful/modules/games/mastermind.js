@@ -154,7 +154,6 @@ function leaveCheck(stateData,m){
 
 function onFind(stateData, member, msg, args){
     stateData.lMsg = msg;
-    var usageHit = false;
 
     if(isNaN(args[0])){
         switch(args[0]){
@@ -202,7 +201,6 @@ function onFind(stateData, member, msg, args){
         else if(args && args[0]) logPush(stateData.log,msg.author.username+': '+messages.noHostSetup);
 
         drawGame(undefined,stateData,!stateData.gameMsg);
-        usageHit = true;
     }
     else{
         //Game flow
@@ -240,7 +238,6 @@ function onFind(stateData, member, msg, args){
         drawGame(stateData.progressArray,stateData);
     }
     msg.delete();
-    if(usageHit) return {cooldownHit: true}
 }
 
 function onEnd(stateData,m,reason){

@@ -298,7 +298,6 @@ function onFind(stateData, member, msg, args){
         //stateData.gameMsg is an object, so if it doesn't exist, we will create a new message.
         drawGame(stateData.game,stateData,!stateData.gameMsg);
         stateData.lMsg.delete();
-        return {cooldownHit:true}
     }
     else{
         var stateMsg;
