@@ -157,7 +157,7 @@ var commands = {
         }
 
         var channelObj = m.channel.guild.channels.cache.get(channel);
-        if(!channelObj.isText()){
+        if(channelObj.type != 'text'){
             m.reply('**Error: not a text channel!**');
             return;
         }

@@ -15,7 +15,7 @@ const client = new Discord.Client(),
     respondToBots = process.argv.indexOf('-b') > -1; //If this flag is toggled, listen to bots
     
 const commands = commandConfig.commands,
-    botActivityMsg = ()=>client.user.setActivity(" ("+commandSymbol+"help) (admins: /adminhelp) - memes & shenaniganz! Deploy me! https://bit.ly/2ZCvh1j"),
+    botActivityMsg = ()=>client.user.setActivity(" ("+commandSymbol+"help) (admins: "+commandSymbol+"adminhelp) - memes & shenaniganz! Deploy me! https://bit.ly/2ZCvh1j"),
 
 //Reactions are the way lemonbot responds back whether that be an emoji or a message to users.
     reactions = {
