@@ -35,7 +35,7 @@ var helpDescriptions = [
     ["rnd", "Ask for a random number"],
     ["rylan", "Display this man's greatness to the channel"],
     ["shuf", "Randomize a list of things"],
-    ["wisdom", "Recieve good advice from a wise man"]
+    ["wisdom", "Recieve good advice from a wise man"],
     ["gamerfy", "Mak3 your t3xt gam3r styl3."]
 ];
 
@@ -79,8 +79,8 @@ var commands = {
         let result = lemonModules.eMark(m.content.substring(2));
         if(!messageOverflow(m,result,m.author.id)) m.reply(result).then(()=>m.delete());
     },
-    'gamerfy':m=>{
-        let result = m.content.substring(2).replaceAll('e','3');
+    'gamerfy':(m,args)=>{
+        let result = args.slice(1).join(' ').replaceAll('e','3');
         if(!messageOverflow(m,result,m.author.id)) m.reply(result).then(()=>m.delete());
 
     },
