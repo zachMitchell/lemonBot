@@ -17,6 +17,11 @@ const stateManager = require('./stateManager'),
     },
     coolInf = require('../corePieces/cooldownInterface');
 
+
+//I need to move this command somewhere else, but it's here because I'm panniking yay
+//grabs the guildId of the message being used. If none exists, then use "dm" (direct message)
+var guildIdOfMessage = msg=>msg.channel.guild?msg.guild.id : 'dm';
+
 //Wow I literally have no comments in this function... LET'S FIX THAT
 //What it says on the tin, find a state with all information provided. If a password is provided, it gives us more context and is more clear than just a username
 function findState(m,pass,cmd,userId){
@@ -58,7 +63,7 @@ function findState(m,pass,cmd,userId){
 
 //hot garbage function for finding users in a guild
 function findUser(m,userId){
-    var guild = guildList[m.channel.guild.id];
+    var guild = guildList[guildIdOfMessage(m)];
 
     if(!guild || !guild.users[userId]) return
     //Two possible outcomes here, if no command was specified, try to join the latest activity, otherwise fail
@@ -67,7 +72,7 @@ function findUser(m,userId){
 
 //Because lemon.js is forced to ignite any new command, we don't need to ever create a cooldown group in this file! If you are importing this file to a different bot however, please keep this in mind.
 //m is a discord message.
-var cooldownExists = m=>commonVars.cooldownGroup && commonVars.cooldownGroup[m.guild.id];
+var cooldownExists = m=>commonVars.cooldownGroup && commonVars.cooldownGroup[guildIdOfMessage(m)];
 
 /*Do stuff before interacting with the command; AKA: preStateExecution
 If for example the target state is expired, we purge it out of existence*/
@@ -82,8 +87,8 @@ function interactWithCommand(state,m,args){
     //A "checkOnly" argument was added to cooldown functionality just to see the status of the command cooldown without affecting the numbers themselves
     //As a result it will be run twice, once to view the status here, and another next time in order to update usage.
     if(cooldownExists(m)){
-        var cooldownInspect = commonVars.cooldownGroup[m.channel.guild.id].updateUsage(state.cmd,m,true);
-        if(cooldownInspect[0]){
+        var cooldownInspect = commonVars.cooldownGroup[guildIdOfMessage(m)].updateUsage(state.cmd,m,true);
+        if(cooldownInspect[0] || cooldownInspect[0] === null){
             coolInf.cooldownStrikeErr(cooldownInspect,m);
             return; //A true boolean over here means we cannot continue running the command.
         }
@@ -96,7 +101,7 @@ function interactWithCommand(state,m,args){
 
     //Cooldown! U ain't escaping it m8 >:)
     if(cooldownExists(m) && returnObj && returnObj.cooldownHit )
-        commonVars.cooldownGroup[m.channel.guild.id].updateUsage(state.cmd,m);
+        commonVars.cooldownGroup[guildIdOfMessage(m)].updateUsage(state.cmd,m);
 
     //If the command wants to do anything else (specifically purging itself for now), do the thing
     if(returnObj && returnObj.endAll)
@@ -142,7 +147,7 @@ function joinState(m,state,args){
 
     var joinCheck = state.joinCheck(state.stateData,m);
     if(joinCheck.joinable){
-        guildList[m.channel.guild.id].joinSession(m.author.id,state);
+        guildList[guildIdOfMessage(m)].joinSession(m.author.id,state);
         interactWithCommand(state,m,args);
     }
     else m.reply(commonVars.cantJoin+joinCheck.reason);
@@ -256,9 +261,9 @@ function createState(m,configObj){
     In my configuration the goal was to have a mix of either accessing sessions only in one guild, or making it open to transferring sessions to multiple guilds.
     Somebody else could easily make this so it's even restricted to certain users; For example, people with discord nitro and non-nitro.
     In my case I'm not using that logic on this layer, so I've left it open to a mixed scope to confirm the logic on the app layer and not the stateful layer.*/
-    var currGuild = guildList[m.guild.id];
+    var currGuild = guildList[guildIdOfMessage(m)];
     if(!currGuild)
-        currGuild = guildList[m.guild.id] = new stateManager.passBase();
+        currGuild = guildList[guildIdOfMessage(m)] = new stateManager.passBase();
     var state = currGuild.createSession(m.author.id,configObj.cmd,newPass,m.createdTimestamp,configObj.expires);
 
     //Listener check - go through every possible listener and add it to the state accordingly:

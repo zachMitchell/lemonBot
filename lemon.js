@@ -52,12 +52,11 @@ const commands = commandConfig.commands,
         'frown',
         'scrunched'
     ]
-}
-
+};
 var responses = {
     'hi lemonbot':m=>{
         rndAction(0,e=>m.reply(e),reactions.hi);
-        // console.log(m);
+        console.log(m);
     },
     'pog':m=>rndAction(5,e=>m.react(emoji[e]),reactions.pog),
     'jojo reference':m=>{
@@ -104,7 +103,7 @@ var cooldownDefaults = {
         uses:2,
         commands:['adminhelp','del','move','mute','umute','voisplit','raid']
     },
-    'statefullGroup':{
+    'gamesGroup':{
         isGroup:true,
         coolTime: 45,
         uses:4,
@@ -151,6 +150,11 @@ for(var i in privateConfig.cooldowns){
     }
 }
 
+//DM's have different permissions, mostly in the vein of disabling things. Very quick & dirty clone
+var dmCooldownDefaults = JSON.parse(JSON.stringify(cooldownDefaults));
+dmCooldownDefaults.gamesGroup = {isGroup:true,commands:['tttoe','hangman','mmind','adminhelp','del','move','mute','umute','voisplit','raid'], uses: 0, coolTime:-1};
+dmCooldownDefaults.adminGroup = dmCooldownDefaults.gamesGroup; //gamesGroup and amdin group are grouped together for the sole purpose of disabling everything
+
 //Finally, take a look at the launching arguments to see if there's a new symbol to execute commands
 var commandSymbol = '/';
 for(var i of process.argv){
@@ -190,9 +194,10 @@ client.on('message',msg=>{
         if(commands[actualCommand] && (!msg.author.bot || respondToBots)){
             //Setup command cooldown for this guild. If there's no config we have defaults
             var guild = msg.channel.guild;
-            if(guild && !cooldownGroup[guild.id])
-                cooldownGroup.createConfig(msg.channel.guild.id,cooldownDefaults);
-            
+            var guildId = guild?guild.id:'dm';
+
+            if(!cooldownGroup[guildId])
+                cooldownGroup.createConfig(guildId, guildId == 'dm' ? dmCooldownDefaults:cooldownDefaults);
 
             /*Admin commands are special - They do not get recorded for cooldown unless somebody doesn't have correct permissions
             If one is found to not have correct permissions, an error will show up instead of launching the command*/
@@ -200,7 +205,7 @@ client.on('message',msg=>{
                 adminCommand = false,
                 permsResults;
 
-            if(adminCommands.commands[actualCommand]){
+            if(guildId!='dm' && adminCommands.commands[actualCommand]){
                 //adminhelp is considered a regular command that checks permissions individually instead of from the get-go, admin checks will skip here in that scenario.
                 adminCommand = true;
                 if(actualCommand == 'adminhelp'){
@@ -217,11 +222,12 @@ client.on('message',msg=>{
             }
 
             //This function tracks the command's use. If we can't use it, don't run the command.
-            var cooldownResults = (!sci.commands[actualCommand] || runAdminCommand) ? undefined: cooldownGroup[msg.channel.guild.id].updateUsage(actualCommand,msg);
+            var cooldownResults = (sci.commands[actualCommand] || runAdminCommand) ? undefined: cooldownGroup[guildId].updateUsage(actualCommand,msg);
+
             if(adminCommand && cooldownResults && !cooldownResults[0])
                 printPermsErr(msg,permsResults[1]);
             //Run the comand
-            if((!guild || !cooldownResults || (cooldownResults && !cooldownResults[0]))){
+            if((!cooldownResults || (cooldownResults && cooldownResults[0] === false ))){ //Exact comparison for false because it could also be null. (disabled)
                 /*Admin commands should silently fail because printPermsErr() should have already showed required permissions.
                 Otherwise if this is a normal command it should run:*/
                 if((adminCommand && runAdminCommand) || !adminCommand){
@@ -231,7 +237,7 @@ client.on('message',msg=>{
     
                     //Change the cooldown time of said command for that user
                     if(typeof commandResults == 'object' && commandResults.cooldownAppend)
-                        cooldownGroup[msg.channel.guild.id].appendSeconds(actualCommand, msg, commandResults.cooldownAppend);
+                        cooldownGroup[guildId].appendSeconds(actualCommand, msg, commandResults.cooldownAppend);
                 }
             }
 

@@ -47,7 +47,7 @@ guild.prototype.updateUsage = function(cmd,message,checkOnly = false){
     if(!(commandUser = targetCommand.users[userId]))
         commandUser = targetCommand.users[userId] = new user(userId,targetCommand.uses,timeStamp);
 
-    if(targetCommand.uses === 0 && coolTime == -1){
+    if(targetCommand.uses === 0 && targetCommand.coolTime == -1){
         var triedAgainOg = commandUser.triedAgain;
         if(!checkOnly) commandUser.triedAgain = true;
         return [null,triedAgainOg];

@@ -136,6 +136,8 @@ function logPush(gameLog, text = ''){
 //Stateful functions
 ////////////////////
 function joinCheck(stateData,msg){
+    if( (msg.guild && stateData.lMsg.guild) && msg.guild.id != stateData.lMsg.guild.id)
+        return {joinable:false, reason: "This command doesn't support playing in-between discord servers"}
     logPush(stateData.log,msg.author.username+' joined the game!');
     return {joinable:true}
 }

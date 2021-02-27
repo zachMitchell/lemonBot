@@ -176,7 +176,7 @@ gameData.prototype.playerWon = function(){
 function joinCheck(stateData,m){
     if(Object.keys(stateData.rootInfo.members).length == 2)
         return {joinable:false, reason:'Max players reached!'}
-    else if(m.guild.id != stateData.lMsg.guild.id)
+    else if( (m.guild && stateData.lMsg.guild) && m.guild.id != stateData.lMsg.guild.id)
         return {joinable:false, reason: "This command doesn't support playing in-between discord servers"}
     else {
         //Join the game
