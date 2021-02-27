@@ -81,7 +81,7 @@ var commands = {
     },
     'gamerfy':m=>{
         let result = m.content.substring(2).replaceAll('e','3');
-        if(!messageOverflow(m,result,m.author.id)) m.reply(besult).then(()=>m.delete());
+        if(!messageOverflow(m,result,m.author.id)) m.reply(result).then(()=>m.delete());
 
     },
     'math':(m,args)=>{
