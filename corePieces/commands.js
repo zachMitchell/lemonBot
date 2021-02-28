@@ -35,7 +35,7 @@ var helpDescriptions = [
     ["rnd", "Ask for a random number"],
     ["rylan", "Display this man's greatness to the channel"],
     ["shuf", "Randomize a list of things"],
-    ["wisdom", "Recieve good advice from a wise man"]
+    ["wisdom", "Recieve good advice from a wise man"],
     ["gamerfy", "Mak3 your t3xt gam3r styl3."]
 ];
 
@@ -83,7 +83,6 @@ var commands = {
         let result = m.content.substring(2).replaceAll('e','3').replaceAll('s','5').replaceAll('b','8')
         .replaceAll('t','7').replaceAll('o','0').replaceAll('i','1')
         if(!messageOverflow(m,result,m.author.id)) m.reply(result).then(()=>m.delete());
-
     },
     'math':(m,args)=>{
 
