@@ -4,72 +4,17 @@
 //His backbone will be discord.js:
 const Discord = require('discord.js');
 const client = new Discord.Client(),
-    emoji = require('./corePieces/emoji'),
-    rndAction = require('./lemonModules/rndAction'),
+    responses = require('./corePieces/responses'),
     adminCommands = require('./corePieces/adminCommands'),
     {checkPerms, printPermsErr} = require('./corePieces/adminTools'),
     sci = require('./stateful/stateCommandInterface'),
     commandConfig = require('./corePieces/commands.js'),
     cooldown = require('./corePieces/cooldown.js'),
     coolInf = require('./corePieces/cooldownInterface'),
+    botActivityMsg = ()=>client.user.setActivity(" ("+commandSymbol+"help) (admins: "+commandSymbol+"adminhelp) - memes & shenaniganz! Deploy me! https://bit.ly/2ZCvh1j"),
     respondToBots = process.argv.indexOf('-b') > -1; //If this flag is toggled, listen to bots
     
 const commands = commandConfig.commands,
-    botActivityMsg = ()=>client.user.setActivity(" ("+commandSymbol+"help) (admins: "+commandSymbol+"adminhelp) - memes & shenaniganz! Deploy me! https://bit.ly/2ZCvh1j"),
-
-//Reactions are the way lemonbot responds back whether that be an emoji or a message to users.
-    reactions = {
-    bigDumb:[
-        'brain',
-        'woozy',
-        'zombieF',
-        'zombieM'
-    ],
-    hi: [
-        'Howdy!',
-        'hiIneedattention',
-        'sup n00b',
-        'Hi!',
-        'Hello!',
-        'salutations and the most epic of greetings to you as well.'
-    ],
-    jojoReference:[
-        'expressionless',
-        'eyeroll',
-        'lying',
-        'flushed'
-    ],
-    pog: [
-        'cool',
-        'mecharm',
-        'moneyface',
-        'starstruck'
-    ],
-    sadness:[
-        'bigCry',
-        'confounded',
-        'cry',
-        'frown',
-        'scrunched'
-    ]
-};
-var responses = {
-    'hi lemonbot':m=>{
-        rndAction(0,e=>m.reply(e),reactions.hi);
-        console.log(m);
-    },
-    'pog':m=>rndAction(5,e=>m.react(emoji[e]),reactions.pog),
-    'jojo reference':m=>{
-        var chance = Math.floor(Math.random()*5);
-        if(chance === 0){
-            var selectedReaction = Math.floor(Math.random()*reactions.jojoReference.length);
-            m.react(emoji[reactions.jojoReference[selectedReaction]]);
-        }
-        else if(chance === 4) m.reply('Yare, yaredaze...');
-    },
-    'big dumb': m=>rndAction(5,e=>m.react(emoji[e]),reactions.bigDumb),
-    'sadness': m=>rndAction(5,e=>m.react(emoji[e]),reactions.sadness)
-}
 
 //This holds every group the bot has touched while it's been turned on. Used to cooldown commands.
 const cooldownGroup = new cooldown.guildGroup();
@@ -168,9 +113,8 @@ for(var i of process.argv){
 //End Private config
 
 //Statefull commands, these are configured within sateCommandInterface and are not like regular commands. However they are treated as such for backward compatibility
-for(var i in sci.commands){
+for(var i in sci.commands)
     commands[i] = sci.commands[i];
-}
 
 //We need two items - inserting the client for @mentions to work, and and the command symbol
 sci.setClient(client);
@@ -182,79 +126,105 @@ client.on('ready',()=>{
     setInterval(botActivityMsg,30*60*1000); //From what I remember, activity messages last for 30 minutes at least for users.
 });
 
+//Grab the contents of a message and converts it into a command/argument pattern
+var parseCommand = (str, symbol = commandSymbol)=>{
+    if(str.indexOf(symbol) !== -0) return [];
+    var args = str.split(' ');
+    var command = args[0].substring(symbol.length);
+    return [command,args];
+}
+
+//Beacuse this was all fused within the client.on statement previously, there will most likely be allot of object deconstruction / object returning in all of these
+var commandChecks = {
+    adminCommand:(m,command,guildId)=>{
+        /*Admin commands are special - They do not get recorded for cooldown unless somebody doesn't have correct permissions
+        If one is found to not have correct permissions, an error will show up instead of launching the command*/
+        var res = {
+            runAdminCommand: false,
+            adminCommand: false,
+            permsResults
+        }
+
+        if(guildId!='dm' && res.adminCommands.commands[command]){
+            //adminhelp is considered a regular command that checks permissions individually instead of from the get-go, admin checks will skip here in that scenario.
+            res.adminCommand = true;
+            if(command == 'adminhelp'){
+                //Check if any commands are applicable; otherwise trigger the cooldown
+
+                //Permissions check but with "or" (if any permissions exist return true)
+                if(checkPerms(m,allPermissions,true,false)[0])
+                    res.runAdminCommand = true;
+                else res.adminCommand = false;
+
+            }
+            else if((res.permsResults = checkPerms(m,adminCommands.permissionsMap[command],false,false))[0])
+                res.runAdminCommand = true;
+        }
+
+        return res;
+    }
+}
+
 //Holy cow, this really needs to be cleaned up >_<*
 client.on('message',msg=>{
-    var gotCommand = false;
+    if(msg.author.bot && !respondToBots) return;
+
     //Commands should be easier to run though since we're using associative arrays to determine if the command is even there
-    if(msg.content.indexOf(commandSymbol) === 0){
-        //Check to see what command we got if at all:
-        var args = msg.content.split(' ');
-        var actualCommand = args[0].substring(commandSymbol.length);
+    //Check to see what command we got if at all:
+    var [actualCommand,args] = parseCommand(msg.content);
 
-        if(commands[actualCommand] && (!msg.author.bot || respondToBots)){
-            //Setup command cooldown for this guild. If there's no config we have defaults
-            var guild = msg.channel.guild;
-            var guildId = guild?guild.id:'dm';
-
-            if(!cooldownGroup[guildId])
-                cooldownGroup.createConfig(guildId, guildId == 'dm' ? dmCooldownDefaults:cooldownDefaults);
-
-            /*Admin commands are special - They do not get recorded for cooldown unless somebody doesn't have correct permissions
-            If one is found to not have correct permissions, an error will show up instead of launching the command*/
-            var runAdminCommand = false,
-                adminCommand = false,
-                permsResults;
-
-            if(guildId!='dm' && adminCommands.commands[actualCommand]){
-                //adminhelp is considered a regular command that checks permissions individually instead of from the get-go, admin checks will skip here in that scenario.
-                adminCommand = true;
-                if(actualCommand == 'adminhelp'){
-                    //Check if any commands are applicable; otherwise trigger the cooldown
-
-                    //Permissions check but with "or" (if any permissions exist return true)
-                    if(checkPerms(msg,allPermissions,true,false)[0])
-                        runAdminCommand = true;
-                    else adminCommand = false;
-                    
-                }
-                else if((permsResults = checkPerms(msg,adminCommands.permissionsMap[actualCommand],false,false))[0])
-                    runAdminCommand = true;
-            }
-
-            //This function tracks the command's use. If we can't use it, don't run the command.
-            var cooldownResults = (sci.commands[actualCommand] || runAdminCommand) ? undefined: cooldownGroup[guildId].updateUsage(actualCommand,msg);
-            if(adminCommand && cooldownResults && !cooldownResults[0])
-                printPermsErr(msg,permsResults[1]);
-            //Run the comand
-            if((!cooldownResults || (cooldownResults && cooldownResults[0] === false ))){ //Exact comparison for false because it could also be null. (disabled)
-                /*Admin commands should silently fail because printPermsErr() should have already showed required permissions.
-                Otherwise if this is a normal command it should run:*/
-                if((adminCommand && runAdminCommand) || !adminCommand){
-                    // console.log(msg);
-                    //ACTUALLY RUN THE COMMAND... this is really burried in allot of fluff isn't it? >_<
-                    var commandResults = commands[actualCommand](msg,args,actualCommand);
-    
-                    //Change the cooldown time of said command for that user
-                    if(typeof commandResults == 'object' && commandResults.cooldownAppend)
-                        cooldownGroup[guildId].appendSeconds(actualCommand, msg, commandResults.cooldownAppend);
-                }
-            }
-
-            //If the command was disabled, show this message assuming this isn't initially an admin command
-            else if(cooldownResults) coolInf.cooldownStrikeErr(cooldownResults,msg);
-            // console.log(cooldownGroup);
-        }
-    }
-    else if(!gotCommand && (!msg.author.bot || respondToBots)){
+    //If a command wasn't typed, check if anyone triggered any pre-built responses
+    if(!actualCommand){
         var content = msg.content.toLowerCase();
         //Recurse through pre-determined chat responses
         for(var i in responses){
             if(content.indexOf(i) > -1){
                 responses[i](msg);
-                break;
+                return;
             }
         }
     }
+
+    if(!commands[actualCommand]) return;
+    //If we get past this if statement, we have a command to play with!
+
+    //Setup command cooldown for this guild. If there's no config we have defaults
+    var guild = msg.channel.guild;
+    var guildId = guild?guild.id:'dm';
+
+    if(!cooldownGroup[guildId])
+        cooldownGroup.createConfig(guildId, guildId == 'dm' ? dmCooldownDefaults:cooldownDefaults);
+
+    //Admin command check
+    var {adminCommand, runAdminCommand, permsResults} = commandChecks.adminCommand(m,actualCommand,guildId)
+
+    //Ignore cooldown check:
+    //This function tracks the command's use. If we can't use it, don't run the command.
+    var cooldownResults = (sci.commands[actualCommand] || runAdminCommand) ? undefined: cooldownGroup[guildId].updateUsage(actualCommand,msg);
+    if(adminCommand && cooldownResults && !cooldownResults[0])
+        printPermsErr(msg,permsResults[1]);
+
+    //check if we can run the command
+    var listOfChecks = [
+        //Exact comparison for false because it could also be null. (disabled)
+        (!cooldownResults || (cooldownResults && cooldownResults[0] === false )),
+        /*Admin commands should silently fail because printPermsErr() should have already showed required permissions.
+        Otherwise if this is a normal command it should run:*/
+        (runAdminCommand) || !adminCommand
+    ]
+
+    //As long as we pass this check, the command will run
+    if(listOfChecks.indexOf(false) == -1){ 
+        //Execute the command//
+        var commandResults = commands[actualCommand](msg,args,actualCommand);
+    
+        //Change the cooldown time of said command for that user
+        if(typeof commandResults == 'object' && commandResults.cooldownAppend)
+            cooldownGroup[guildId].appendSeconds(actualCommand, msg, commandResults.cooldownAppend);
+    }
+
+    //If the command was disabled, show this message assuming this isn't initially an admin command
+    else if(!adminCommand && cooldownResults) coolInf.cooldownStrikeErr(cooldownResults,msg);
 });
 
 client.login(require('./token.js'));
