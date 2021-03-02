@@ -79,8 +79,8 @@ var commands = {
         let result = lemonModules.eMark(m.content.substring(2));
         if(!messageOverflow(m,result,m.author.id)) m.reply(result).then(()=>m.delete());
     },
-    'gamerfy':m=>{
-        let result = m.content.substring(2).replaceAll('e','3').replaceAll('s','5').replaceAll('b','8')
+    'gamerfy':(m,args)=>{
+        let result = args.slice(1).join(' ').replaceAll('e','3').replaceAll('s','5').replaceAll('b','8')
         .replaceAll('t','7').replaceAll('o','0').replaceAll('i','1')
         if(!messageOverflow(m,result,m.author.id)) m.reply(result).then(()=>m.delete());
     },
