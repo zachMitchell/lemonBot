@@ -103,9 +103,9 @@ var commands = {
         if(!messageOverflow(m,result,m.author.id)) m.reply(result).then(()=>m.delete());
     },
     'gamerfy':(m,args)=>{
-        let result = args.slice(1).join(' ').replaceAll('e','3');
+        let result = args.slice(1).join(' ').replaceAll('e','3').replaceAll('s','5').replaceAll('b','8')
+        .replaceAll('t','7').replaceAll('o','0').replaceAll('i','1')
         if(!messageOverflow(m,result,m.author.id)) m.reply(result).then(()=>m.delete());
-
     },
     'math':(m,args)=>{
 
