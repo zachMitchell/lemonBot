@@ -35,8 +35,32 @@ var helpDescriptions = [
     ["rnd", "Ask for a random number"],
     ["rylan", "Display this man's greatness to the channel"],
     ["shuf", "Randomize a list of things"],
-    ["wisdom", "Recieve good advice from a wise man"]
+    ["wisdom", "Recieve good advice from a wise man"],
+    ["gamerfy", "Mak3 y0ur 73x7 gam3r 57yl3."]
 ];
+
+//Also originally in lemon.js - cooldowns that are set for each command defined here. They are limiters for how often a command can be used.
+var cooldowns = {
+    'textWarpersGroup':{
+        isGroup:true,
+        coolTime:15,
+        uses:3,
+        commands:['camel','creepy','e','back']
+    },
+    //Clever name am I right? :D
+    'once5Secs':{
+        isGroup:true,
+        coolTime:5,
+        uses:1,
+        commands:['age','dumbot','wisdom']
+    },
+    'math': { coolTime:25, uses:5 },
+    'mock': { coolTime:15, uses:1 },
+    'help':{coolTime:180,uses:1 },
+    'rnd':{ coolTime:3, uses:2 },
+    'rylan':{ coolTime:30, uses:2 },
+    'shuf':{ coolTime:90, uses:1 },
+}
 
 var commands = {
     'age':(m,args)=>{
@@ -76,6 +100,11 @@ var commands = {
     },
     'e':m=>{
         let result = lemonModules.eMark(m.content.substring(2));
+        if(!messageOverflow(m,result,m.author.id)) m.reply(result).then(()=>m.delete());
+    },
+    'gamerfy':(m,args)=>{
+        let result = args.slice(1).join(' ').replaceAll('e','3').replaceAll('s','5').replaceAll('b','8')
+        .replaceAll('t','7').replaceAll('o','0').replaceAll('i','1')
         if(!messageOverflow(m,result,m.author.id)) m.reply(result).then(()=>m.delete());
     },
     'math':(m,args)=>{
@@ -172,6 +201,7 @@ var commands = {
 }
 
 module.exports = {
+    commands:commands,
+    cooldowns:cooldowns,
     helpDescriptions:helpDescriptions,
-    commands:commands
 };

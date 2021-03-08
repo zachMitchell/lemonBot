@@ -346,5 +346,6 @@ module.exports = {
     setCommandSymbol:e=>commonVars.symbol = e,
     setCooldownGroup:e=>commonVars.cooldownGroup = e,
     commands:commands,
-    helpDescriptions:helpDescriptions
+    helpDescriptions:helpDescriptions,
+    disabledDMCommands:['join','leave']
 }

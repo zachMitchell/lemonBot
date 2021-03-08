@@ -88,6 +88,19 @@ var permissionsMap = (permsObj=>{
     "MANAGE_MESSAGES":['del','move']
 });
 
+//See commands.js & cooldown.js for more information
+const cooldowns = {
+    //This is to discourage spamming the admin error message
+    'adminGroup':{
+        isGroup:true,
+        glue:true,
+        coolTime:60*60,
+        uses:2,
+        commands:['adminhelp','del','move','mute','umute','voisplit','raid']
+    },
+}
+const disabledDMCommands = ['adminhelp','del','move','mute','umute','voisplit','raid'];
+
 var commands = {
     'adminhelp':m=>{
         //This command is special as it checks for every permission in order to compile a help list relavent to whoever ran it.
@@ -157,7 +170,7 @@ var commands = {
         }
 
         var channelObj = m.channel.guild.channels.cache.get(channel);
-        if(!channelObj.isText()){
+        if(channelObj.type != 'text'){
             m.reply('**Error: not a text channel!**');
             return;
         }
@@ -325,5 +338,7 @@ var commands = {
 
 module.exports = {
     commands:commands,
+    cooldowns:cooldowns,
+    disabledDMCommands:disabledDMCommands,
     permissionsMap:permissionsMap
 };

@@ -119,7 +119,8 @@ Inside the config should be an object that's json friendly:
 guildGroup.prototype.createConfig = function(guildId,config){
     this[guildId] = new guild(guildId);
     for(let i in config){
-        this[guildId].commands[i] = new command(config[i].uses,config[i].coolTime);
+        if(!config[i].isGroup || config[i].commands.length)
+            this[guildId].commands[i] = new command(config[i].uses,config[i].coolTime);
 
         //Groups are a basic way to bind a single cooldown instance to more commands.
         //If glue is set to true: if one command gets a cooldown, so will the others. Otherwise cooldown times are independent.
