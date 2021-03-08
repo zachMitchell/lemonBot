@@ -36,7 +36,7 @@ var helpDescriptions = [
     ["rylan", "Display this man's greatness to the channel"],
     ["shuf", "Randomize a list of things"],
     ["wisdom", "Recieve good advice from a wise man"],
-    ["gamerfy", "Mak3 your t3xt gam3r styl3."]
+    ["gamerfy", "Mak3 y0ur 73x7 gam3r 57yl3."]
 ];
 
 //Also originally in lemon.js - cooldowns that are set for each command defined here. They are limiters for how often a command can be used.

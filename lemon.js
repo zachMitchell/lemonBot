@@ -224,8 +224,12 @@ client.on('message',msg=>{
     //As long as we pass this check, the command will run
     if(listOfChecks.indexOf(false) == -1){ 
         //Execute the command//
+        if(!msg.channel.permissionsFor(msg.guild.members.cache.get(client.user.id)).has('SEND_MESSAGES')){
+            console.log('I cannot speak here ('+msg.channel.id+')');
+            return;
+        } 
         var commandResults = commands[actualCommand](msg,args,actualCommand);
-    
+
         //Change the cooldown time of said command for that user
         if(typeof commandResults == 'object' && commandResults.cooldownAppend)
             cooldownGroup[guildId].appendSeconds(actualCommand, msg, commandResults.cooldownAppend);

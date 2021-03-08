@@ -62,6 +62,7 @@ var reactions = {
 //Lemonbot scans these and checks if the message includes the exact phrase (lower case). If this happens, lemonbot executes the respective phrase.
 var responses = {
     'hi lemonbot':m=>{
+        if(!m.channel.permissionsFor(m.guild.members.cache.get(client.user.id)).has('SEND_MESSAGES')) return;
         rndAction(0,e=>m.reply(e),reactions.hi);
         // console.log(m);
     },
