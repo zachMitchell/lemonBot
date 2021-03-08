@@ -1,7 +1,4 @@
 //Made by Zachary Mitchell in 2021!
-
-const { cool } = require("../../../corePieces/emoji");
-
 //One of the first video games was tictactoe on a mainframe machine. I don't have one of those though, so this will be through discord instead
 var messages = {
     joined:' joined as ',

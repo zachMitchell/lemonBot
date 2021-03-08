@@ -1,8 +1,26 @@
 //Made by Zachary Mitchell in 2021!
 //lemon.js is in the process of being cleaned up. One of these things being sorted out is the responses lemonbot makes when somebody remarks with a special set of wors
-
-const emoji = require('./emoji'),
-    rndAction = require('../lemonModules/rndAction');
+const rndAction = require('../lemonModules/rndAction'),
+//I haven't put an emoji inside a text file until today, it feels weird.
+    emoji = {
+        'brain':'🧠',
+        'bigCry':'😭',
+        'cool':'😎',
+        'confounded':'😖',
+        'cry':'😢',
+        'expressionless':'😑',
+        'eyeroll':'🙄',
+        'flushed':'😳',
+        'frown':'☹️',
+        'lying':'🤥',
+        'mecharm':'🦾',
+        'moneyface':'🤑',
+        'scrunched':'😣',
+        'starstruck':'🤩',
+        'woozy':'🥴',
+        'zombieF':'🧟‍♀️',
+        'zombieM':'🧟‍♂️'
+    };
 
 //Reactions are the way lemonbot responds back whether that be an emoji or a message to users.
 var reactions = {
