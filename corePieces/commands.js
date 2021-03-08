@@ -45,7 +45,7 @@ var cooldowns = {
         isGroup:true,
         coolTime:15,
         uses:3,
-        commands:['camel','creepy','e','back']
+        commands:['camel','creepy','e','back','gamerfy']
     },
     //Clever name am I right? :D
     'once5Secs':{
