@@ -205,8 +205,8 @@ client.on('message',msg=>{
     //Ignore cooldown check:
     //This function tracks the command's use. If we can't use it, don't run the command.
     var cooldownResults;
-    //disabled commands are scanned here in case there is an overhead that normally allows it regardless of anything else. 
-    if((guildId == 'dm' && disabledDMCommands.indexOf(actualCommand) > -1) || !sci.commands[actualCommand] || !runAdminCommand)
+    //disabled commands are scanned here in case there is an overhead that normally allows it regardless of anything else.
+    if((guildId == 'dm' && disabledDMCommands.indexOf(actualCommand) > -1) || !sci.commands[actualCommand] && !runAdminCommand)
         cooldownResults = cooldownGroup[guildId].updateUsage(actualCommand,msg);
 
     if(adminCommand && cooldownResults && !cooldownResults[0])
@@ -215,7 +215,7 @@ client.on('message',msg=>{
     //check if we can run the command
     var listOfChecks = [
         //Exact comparison for false because it could also be null. (disabled)
-        (!cooldownResults || (cooldownResults && cooldownResults[0] === false )),
+        (!cooldownResults || cooldownResults[0] === false ),
         /*Admin commands should silently fail because printPermsErr() should have already showed required permissions.
         Otherwise if this is a normal command it should run:*/
         (runAdminCommand) || !adminCommand
@@ -235,8 +235,9 @@ client.on('message',msg=>{
             cooldownGroup[guildId].appendSeconds(actualCommand, msg, commandResults.cooldownAppend);
     }
 
-    //If the command was disabled, show this message assuming this isn't initially an admin command
-    else if(!adminCommand && cooldownResults) coolInf.cooldownStrikeErr(cooldownResults,msg);
+    //Determine inside cooldownStrikeErr if we should show said error. In the specific scenario of abusing admin commands when you can't use them, this is also applied.
+    else if((adminCommand && cooldownResults && cooldownResults[0] && !cooldownResults[1]) || 
+    (!adminCommand && cooldownResults)) coolInf.cooldownStrikeErr(cooldownResults,msg);
 });
 
 client.login(require('./token.js'));
