@@ -11,7 +11,6 @@ var messages = {
     endEarlyDeny:'Sorry, only the host can end the game :/',
     invalidNumber:'The number needs to be numbers 1 through 9 :)',
     takenPlace: 'Whoops, that was already used! try again',
-    help: 'For help, type: /tttoe help',
     notYourTurn:[
         "It's not your turn!",
         "Not your turn yet!",
@@ -62,9 +61,8 @@ const renderers = {
         for(var i in playerData)
             result+= (i > 0 ? '\n' : '') + pieces[xoArray[i]] + ' - ' + (playerData[i] ? playerData[i].username: '???') + (stateData.game.currentTurn == i ? (stateData.game.winner? winnerPiece : currentTurn) : '');
 
-        var joinIdentifier = stateData.rootInfo.host ? '<@'+stateData.rootInfo.host.userId+'>' : stateData.rootInfo.pass;
         //Expires & join message:
-        result+='\nGame expires `5 minutes` after last move\nTo join: `/join` '+joinIdentifier+' OR: "<@'+stateData.lMsg.client.user.id+'> '+ joinIdentifier+'" \nPasscode: `'+stateData.rootInfo.pass+'`';
+        result+='\nGame expires `5 minutes` after last move\nFor help, type: `/tttoe help` \nPasscode: `'+stateData.rootInfo.pass+'`';
 
         return result;
     },
@@ -88,6 +86,11 @@ const renderers = {
 
         return result+'```';
     }
+}
+
+function renderToJoinText(stateData,userIdOverride){
+    var joinIdentifier = userIdOverride? '@'+userIdOverride : stateData.rootInfo.host ? '@'+stateData.usernames[stateData.rootInfo.host.userId] : stateData.rootInfo.pass;
+    return '(To join: "/join '+joinIdentifier+'" OR: "@'+stateData.lMsg.client.user.username + ' ' + joinIdentifier +'")';
 }
 
 //In the event we need to draw a new message to play the game, just create a new message.
@@ -182,16 +185,17 @@ function joinCheck(stateData,m){
         if(playerData[0]) emptySlot++; // if the X slot is filled in, make it O instead
         playerData[emptySlot] = m.author;
 
-        logPush(stateData.log,m.author.username+messages.joined+pieces[xoArray[emptySlot]]);
+        stateData.usernames[m.author.id] = m.author.username;
+        //We don't set a host here, but when a member joins, they immediately launch onFind, so that will identify the host.
+        if(!Object.keys(stateData.rootInfo.members).length)
+            stateData.newHost = true;
+        
+        logPush(stateData.log,m.author.username+messages.joined+pieces[xoArray[emptySlot]] + (stateData.newHost?'\n'+renderToJoinText(stateData,m.author.username):''));
 
         if(playerData.indexOf(undefined) == -1 && stateData.initialSetup < 2){
             stateData.initialSetup++;
             logPush(stateData.log,messages.gameStart[0] + pieces[xoArray[stateData.game.currentTurn]] + messages.gameStart[1] );
         }
-
-        //We don't set a host here, but when a member joins, they immediately launch onFind, so that will identify the host.
-        if(!Object.keys(stateData.rootInfo.members).length)
-            stateData.newHost = true;
         
         drawGame(stateData.game,stateData.log,stateData);
         return {joinable: true}
@@ -201,24 +205,29 @@ function joinCheck(stateData,m){
 function leaveCheck(stateData,m){
     //Remove traces of this user's existence
     //The state command interface takes care of if this user is present in the game.
+    delete stateData.usernames[m.author.id]
     for(var i in stateData.game.players)
         if(stateData.game.players[i] == m.author){
             stateData.game.players[i] = undefined; //not using delete here because that reduces length
             break;
         }
 
-    logPush(stateData.log,m.author.username + ' left the game...');
     //Deleting the host early doesn't affect the flow of the state manager:
     if(m.author.id == stateData.rootInfo.host.userId)
         delete stateData.rootInfo.host;
 
+    var renderNotice = false;
     //Replace the host if they leave. If nobody's around, the game is still accessible by code until expiration
     if(!stateData.rootInfo.host){
-        var newHost = stateData.game.players[0] || stateData.game.players[1];
+        //This is the next index because the original host is leaving. In technicality he doesn't leave until leaveCheck is finished running, so we're thinking *ahead
+        var newHost = stateData.rootInfo.members[Object.keys(stateData.rootInfo.members)[1]];
         if(newHost) stateData.rootInfo.host = newHost;
-        else logPush(stateData.log,messages.notice);
+        else renderNotice = true;
         //The @mention would be replaced with the passcode until the game expires or a new host joins.
     }
+
+    logPush(stateData.log,m.author.username + ' left the game...'+(stateData.rootInfo.host?' '+renderToJoinText(stateData,stateData.usernames[stateData.rootInfo.host.userId]):''));
+    if(renderNotice) logPush(stateData.log,messages.notice + '\n'+renderToJoinText(stateData));
 
     drawGame(stateData.game,stateData.log,stateData);
 
@@ -232,11 +241,14 @@ function onFind(stateData, member, msg, args){
     //initialSetup increments everytime a step in the game setup finishes When it reaches 3: it starts to say who's turn is next. 
     if(!stateData.initialSetup){
         stateData.game = new gameData(msg.author);
+        stateData.usernames = {};
+        stateData.usernames[msg.author.id] = msg.author.username;
+
         //Initial log data is always the same:
         stateData.log = [
             msg.author.username + messages.joined + pieces.x,
             messages.secondPlayer,
-            messages.help
+            renderToJoinText(stateData)
         ];
 
         //The "display" per-say of the game.

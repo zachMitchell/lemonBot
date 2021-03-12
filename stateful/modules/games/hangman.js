@@ -63,15 +63,7 @@ const {quoteParser} = require('../../../corePieces/mentionTools'),
 ],
     noMiss = '🟩',
     renderers = {
-    headerInfo:function(stateData){
-        var result = '',
-        joinIdentifier = stateData.rootInfo.host ? '<@'+stateData.rootInfo.host.userId+'>' : stateData.rootInfo.pass;
-        
-        //Expires & join message:
-        result+='\nGame expires `5 minutes` after last move\nTo join: `/join` '+joinIdentifier+' OR: "<@'+stateData.lMsg.client.user.id+'> '+ joinIdentifier+'" \nPasscode: `'+stateData.rootInfo.pass+'`';
-
-        return result;
-    },
+    headerInfo:(stateData)=>'**To join: `/join @'+stateData.hostUsername+'` OR: `@'+stateData.lMsg.client.user.username+' @' + stateData.hostUsername+'`**\nGame expires `5 minutes` after last move\nPasscode: `'+stateData.rootInfo.pass+'`',
     board:function(gameObj){
         var result = '';
         //End early if we have no game data.
@@ -273,7 +265,9 @@ function onFind(stateData, member, msg, args){
                 msg.author.username+' joined the game!',
                 messages.joined,
                 messages.quickStart
-            ]
+            ];
+
+            stateData.hostUsername = msg.author.username;
         }
         //Initialize game data.
         //Scan arguments

@@ -13,7 +13,9 @@ Items straight from /help:
 * `/creepy` - tYpE lIkE a CrEePy PeRsOn
 * `/dumbot` - Ask an intelligent question
 * `/e` - b[e] r[e]sponsibl[e] with this on[e]
+* `/gamerfy` - Mak3 y0ur 73x7 gam3r 57yl3.
 * `/math` - Do Stonks
+* `/mock` - End all your debates instantly with the power of mocking spongebob!
 * `/rnd` - Ask for a random number
 * `/shuf` - Randomize a list of things
 * `/wisdom` - Recieve good advice from a wise man
@@ -21,6 +23,18 @@ Items straight from /help:
 And most importantly, a guy named Rylan
 
 ![RylanStylin](./readmeAssets/rylan.png)
+
+## [Games](./manuals/sessionsAndGames.md)!
+
+Lemonbot is loaded with home-grown techniques designed to help you play games! He can play...
+
+* `/hangman` - Guess the word! ...or the emoji man dies
+* `/mmind` - Mastermind: A game of logic to crack the code of your opponent!
+* `/tttoe` - A casual game of tic-tac-toe, but with discord friends!
+
+And to jump in and out of said games:
+* `/join`
+* `/leave`
 
 ## Administrative & development features
 * Command cooldowns - every default command in lemonbot's arsenal has a way of knowing how often each discord member uses a command. If somebody uses that command too much, lemonbot will get tired and a cooldown is set for that user. For example, `/help` can be used once every 3 minutes and `/math` can be used 3 times every 25 seconds.
@@ -37,11 +51,13 @@ And most importantly, a guy named Rylan
 * `/voisplit` - *Put everyone randomly (but evenly) into different voice channels* - if you have 6 users in one voice chat room and have two other chat rooms, this command will spread everyone out into groups of 2 amongst selected rooms.
 * `/raid` - *Move entire voice channels into another channel* - you can select multiple channels and group everyone into the last mentioned channel in the command.
 
-# Instruction manual
+# Instruction manuals
 
 The non-admin commands are pretty straightforward to use. The admin commands however can go very in-depth. Because of this, and manual was written to demonstrate Lemonbot's abilities.
 
-[Check this link](./adminManual.md) to open the manual
+[Check this link](./manuals/adminCommands.md) to open the manual
+
+There's also brief documentation on [how to use session/game commands](./manuals/sessionsAndGames.md)
 
 # Deploying Lemonbot
 
@@ -89,6 +105,16 @@ Add your bot's token to `privateConfig.js`, commit the changes and deploy to her
 ```git push heroku herokuBranch:master```
 
 Note the special syntax: `herokuBranch:master`. This means our new branch is pretending to be master. With this, if you decide to contribute to master or you get the latest changes, they won't conflict with your personal work. When you want to get lemonbot updates, either pull from master while on `herokuBranch`, or visit the master branch, pull, then merge `herokuBranch` with master.
+
+# Special Thanks & Credits
+
+* To the folks in our local friend group (limewithease) - I have no words but thank you. It's been a pleasure to Build lemonbot thus far. While I wasn't expecting to really accelerate him to where he is, it's by far all of you having fun with him that keeps my motivation burning to keep him fun! The path for lemonbot is not over as I write this, and I sincerely hope we can continue to pave a fruity future!
+
+* Additional thanks for Renegace32, RylanStylan and Platinummink for contributing new features to lemonbot. All three of you have learned allot just by coding a few lines, and it brings to lemonbot some unique spice as a result of that as well.
+
+* Yet another special thanks to lemonbot's second home: "King George II's Royal Court" where he was humourously knighted a "royal bot". This server was an important step to test his performance learned from limewithease, and in the end I made allot of friends jumping in to the server as well. All of you are awesome and thank you for also using lemonbot!
+
+* One last thanks to @PT_P (Royal court) for founding the community server. I most likely would have started it much later, but now it's here and will probably grow fast. Right now it's just 5 curious members, but here's to wild ride in the future!
 
 # License
 

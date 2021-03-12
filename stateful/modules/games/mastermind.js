@@ -2,7 +2,7 @@
 //Mastermind is a game I got for Christmas. The rules are extremely simple, but in this version instead of pegs, we'll use numbers.
 const shuffle = require('../../../lemonModules/shuffle'),
     messages = {
-    newGame:'New game of mastermind! For help: `/mmind help`. Start a new game with a random number (`rnd`) or put in your own number! (`||1234||`)',
+    newGame:'New game of mastermind! For help: /mmind help. Start a new game with a random number (`rnd`) or put in your own number! (||1234||)',
     hostEnd:'[The host has left the game]',
     onlyNumbers:'Sorry, the game only takes in numbers 4 digits, each being 1 through 6! (For a random game, just type "rnd" without the `||`)',
     shortNumber:'Looks like the number is too short, 4-digits please! (Numbers 1-6)',
@@ -34,15 +34,7 @@ const shuffle = require('../../../lemonModules/shuffle'),
     numberSprites = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣'],
     progressPegs = ['⬜','🟥'],
     renderers = {
-    headerInfo:function(stateData){
-        var result = '',
-        joinIdentifier = stateData.rootInfo.host ? '<@'+stateData.rootInfo.host.userId+'>' : stateData.rootInfo.pass;
-        
-        //Expires & join message:
-        result+='\nGame expires `5 minutes` after last move\nTo join: `/join` '+joinIdentifier+' OR: "<@'+stateData.lMsg.client.user.id+'> '+ joinIdentifier+'" \nPasscode: `'+stateData.rootInfo.pass+'`';
-
-        return result;
-    },
+    headerInfo:(stateData)=>'**To join: `/join @'+stateData.hostUsername+'` OR: `@'+stateData.lMsg.client.user.username+' @' + stateData.hostUsername+'`**\nGame expires `5 minutes` after last move\nPasscode: `'+stateData.rootInfo.pass+'`',
     board:function(gameObj){
         var result = '';
         //End early if we have no game data.
@@ -173,7 +165,10 @@ function onFind(stateData, member, msg, args){
 
     if(!stateData.progressArray){
         if(member == stateData.rootInfo.host){
-            if(!stateData.log) stateData.log = [messages.newGame];
+            if(!stateData.log){
+                stateData.log = [messages.newGame];
+                stateData.hostUsername = msg.author.username;
+            }
             var targetNumber = "";
             //Take in the first argument:
             if(args && args[0] && args[0].indexOf('||') == 0){
