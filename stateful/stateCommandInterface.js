@@ -7,6 +7,8 @@ const stateManager = require('./stateManager'),
     //Every state regardless of guild
     activeStates = {},
     guildList = {},
+    disabledDMCommands = ['join','leave'],
+    cooldowns = {},
     commonVars = {
         cantJoin:'Sorry, the command blocked you from joining. Reason: ',
         cantLeave:'Sorry, the command blocked you from leaving. Reason: ',
@@ -300,13 +302,9 @@ var commands = {
 },
 //These will display based on help descriptions of commands from fileCore. Descriptions from /join and /leave will be present too.
 helpDescriptions = [
-    ['join','hop into an existing activity with your friends!'],
-    ['leave',"exit an activity you're in the middle of"]
+    ['join','hop into an existing activity with your friends!','tool'],
+    ['leave',"exit an activity you're in the middle of",'tool']
 ]
-
-//Append custom commands to this list.
-for(var i in fileCore)
-    helpDescriptions.push([i,fileCore[i].helpText])
 
 /*Initial setup for the commands object. The dependency for this part is fileCore.js in order to create a consistent foundation.
 For backwards compatibility with commands.js, everything will be addressed as if each item were their own command. The main difference 
@@ -323,8 +321,16 @@ function commandIgnite(m,args,actualCommand){
 }
 
 //Time to fill up the commands object! It will be commandIgnite for everything, because the command is distinguished via the actualCommand argument
-for(var i in fileCore)
+for(var i in fileCore){
     commands[i] = commandIgnite;
+    if(fileCore[i].helpText){
+        helpDescriptions.push([i,fileCore[i].helpText])
+        if(fileCore[i].category) helpDescriptions[helpDescriptions.length-1].push(fileCore[i].category);
+    }
+    if(fileCore[i].uses != undefined || fileCore[i].coolTime != undefined)
+        cooldowns[i] = { coolTime:fileCore[i].coolTime, uses:fileCore[i].uses };
+    if(fileCore[i].disabledInDM) disabledDMCommands.push(i);
+}
 
 //This interval will do a constant sweep and check if items are expiring or not.
 //Not sure if it's the best idea, but it's mostly to prevent holding thousands of timeouts and resetting them.
@@ -346,6 +352,7 @@ module.exports = {
     setCommandSymbol:e=>commonVars.symbol = e,
     setCooldownGroup:e=>commonVars.cooldownGroup = e,
     commands:commands,
+    cooldowns:cooldowns,
     helpDescriptions:helpDescriptions,
-    disabledDMCommands:['join','leave']
+    disabledDMCommands:disabledDMCommands
 }

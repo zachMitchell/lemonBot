@@ -24,19 +24,19 @@ delete moduleList;
 
 //Command help descriptions are over here. Some dynamic items are here to sort help in alphabetical order
 var helpDescriptions = [
-    ["age", "Find out the age of two discord accounts"],
-    ["back", "!naidrocsid gnuoy eikooc trams a er'uoy yeh ho"],
-    ["camel", "typeLikeANerd"],
-    ["creepy", "tYpE lIkE a CrEePy PeRsOn"],
-    ["dumbot", "Ask an intelligent question"],
-    ["e", "b[e] r[e]sponsibl[e] with this on[e]"],
-    ["math", "Do Stonks"],
-    ["mock","End all your debates instantly with the power of mocking spongebob!"],
-    ["rnd", "Ask for a random number"],
-    ["rylan", "Display this man's greatness to the channel"],
-    ["shuf", "Randomize a list of things"],
-    ["wisdom", "Recieve good advice from a wise man"],
-    ["gamerfy", "Mak3 y0ur 73x7 gam3r 57yl3."]
+    ["age", "Find out the age of two discord accounts",'tool'],
+    ["back", "!naidrocsid gnuoy eikooc trams a er'uoy yeh ho",'text'],
+    ["camel", "typeLikeANerd",'text'],
+    ["creepy", "tYpE lIkE a CrEePy PeRsOn",'text'],
+    ["dumbot", "Ask an intelligent question",'meme'],
+    ["e", "b[e] r[e]sponsibl[e] with this on[e]",'text'],
+    ["gamerfy", "Mak3 y0ur 73x7 gam3r 57yl3.",'text'],
+    ["math", "Do Stonks",'tool'],
+    ["mock","End all your debates instantly with the power of mocking spongebob!",'meme'],
+    ["rnd", "Ask for a random number",'tool'],
+    ["rylan", "Display this man's greatness to the channel",'meme'],
+    ["shuf", "Randomize a list of things",'tool'],
+    ["wisdom", "Recieve good advice from a wise man",'meme'],
 ];
 
 //Also originally in lemon.js - cooldowns that are set for each command defined here. They are limiters for how often a command can be used.
@@ -56,7 +56,6 @@ var cooldowns = {
     },
     'math': { coolTime:25, uses:5 },
     'mock': { coolTime:15, uses:1 },
-    'help':{coolTime:180,uses:1 },
     'rnd':{ coolTime:3, uses:2 },
     'rylan':{ coolTime:30, uses:2 },
     'shuf':{ coolTime:90, uses:1 },
@@ -188,16 +187,6 @@ var commands = {
     'wisdom':m=>{
         m.channel.send('> '+lemonModules.rylansWisdom()+' -RylanStylin');
     },
-    //Help message. this should also be updated along with new commands:
-    'help':m=>{
-        var resultStr = 'I have a lot of commands!';
-        //Insert help strings
-        for(var i of helpDescriptions)
-            resultStr+='`\n'+'/'+i[0]+'` - '+i[1];
-
-        m.channel.send(resultStr);
-    }
-
 }
 
 module.exports = {

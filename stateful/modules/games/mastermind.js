@@ -249,6 +249,10 @@ function onEnd(stateData,m,reason){
 module.exports = {
     cmd:'mmind',
     helpText:'Mastermind: A game of logic to crack the code of your opponent!',
+    uses:4,
+    coolTime: 45,
+    disabledInDM:true,
+    category:'game',
     joinCheck:joinCheck,
     onFind:onFind,
     onEnd:onEnd,

@@ -327,6 +327,10 @@ function onEnd(stateData,m,reason){
 module.exports = {
     cmd:'hangman',
     helpText:'Guess the word! ...or the emoji man **dies**',
+    uses:4,
+    coolTime: 45,
+    disabledInDM:true,
+    category:'game',
     joinCheck:joinCheck,
     onFind:onFind,
     onEnd:onEnd,

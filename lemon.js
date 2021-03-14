@@ -10,6 +10,7 @@ const client = new Discord.Client(),
     {checkPerms, printPermsErr} = require('./corePieces/adminTools'),
     cooldown = require('./corePieces/cooldown.js'),
     coolInf = require('./corePieces/cooldownInterface'),
+    helpEmoji = require('./lemonModules/helpEmoji'),
     privateCore = require('./privateCore'),
     respondToBots = process.argv.indexOf('-b') > -1, //If this flag is toggled, listen to bots
     responses = require('./corePieces/responses'),
@@ -56,18 +57,30 @@ Private configuration - you can use lemonbot as a base for some of your own proj
     be included in the bot. This is convenient for something like heroku deployment where you can just pull in the lastest changes from the community without much hastle*/
 
 //Master commands list, aggregated across all files.
-const commands = {},
-    helpDescriptions = commandConfig.helpDescriptions, //We need a base here so "/help" can see it from commands.js.
-    cooldownDefaults = {
-        //I'm not sure how to apply this directly to stateful commands yet, or at least group them coherently. They're fine here for now :P
-        'gamesGroup':{
-            isGroup:true,
-            coolTime: 45,
-            uses:4,
-            commands:['tttoe','hangman','mmind']
+const commands = {
+    //Help message. this should also be updated along with new commands:
+    'help':(m,args)=>{
+        var pageMax = 10;
+        var page = !isNaN(args[1])? args[1]: 1,
+            pageCount = Math.ceil(helpDescriptions.length / pageMax);
+        
+        if(page > pageCount) page = pageCount;
+        else if(page < 1) page = 1;
+
+        //Insert help strings
+        var resultStr = (pageCount > 1?'(Page '+page+' of '+pageCount+')\n':'') + 'I have a lot of commands!';
+        for(var i = 0; i < pageMax; i++){
+            var currDesc = helpDescriptions[i + ((page-1) * 10)];
+            if(currDesc) resultStr+='\n'+(helpEmoji[currDesc[2]] || helpEmoji['unknown'])+' `'+commandSymbol+currDesc[0]+'` - '+currDesc[1];
+            else break;
         }
-    },
-    disabledDMCommands = ['tttoe','hangman','mmind'];
+
+        m.channel.send(resultStr);
+    }
+},
+    helpDescriptions = commandConfig.helpDescriptions, //We need a base here so "/help" can see it from commands.js.
+    cooldownDefaults = {'help':{ coolTime:180,uses:2 }},
+    disabledDMCommands = [];
 
 for(var config of [adminCommands,commandConfig,privateConfig,sci]){
     //Aggregate all commands:

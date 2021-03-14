@@ -353,6 +353,10 @@ function onEnd(stateData,m,reason){
 module.exports = {
     cmd:'tttoe',
     helpText:'A casual game of tic-tac-toe, but with discord friends!',
+    uses:4,
+    coolTime: 45,
+    disabledInDM:true,
+    category:'game',
     joinCheck:joinCheck,
     onFind:onFind,
     onEnd:onEnd,
